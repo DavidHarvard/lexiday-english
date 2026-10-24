@@ -1,0 +1,20 @@
+import {createServer} from 'node:http';
+import {readFileSync,existsSync,mkdirSync,writeFileSync,statSync} from 'node:fs';
+import {resolve,extname} from 'node:path';
+import worker from './worker.js';
+import {database} from './local-db.mjs';
+const root=resolve('dist');mkdirSync('.local',{recursive:true});
+if(!existsSync('.local/pepper'))writeFileSync('.local/pepper',crypto.randomUUID()+crypto.randomUUID(),{mode:0o600});
+const env={DB:database('.local/lexiday.sqlite'),AUTH_PEPPER:readFileSync('.local/pepper','utf8'),ASSETS:{fetch:async request=>{
+ const path=resolve(root,'.'+decodeURIComponent(new URL(request.url).pathname));
+ if(!path.startsWith(root+'/')&&path!==root||path.includes('/_'))return new Response('Not found',{status:404});
+ const file=path===root?resolve(root,'index.html'):path;
+ if(!existsSync(file)||!statSync(file).isFile())return new Response('Not found',{status:404});
+ const mime={'.js':'text/javascript','.css':'text/css','.html':'text/html'}[extname(file)]||'application/octet-stream';
+ return new Response(readFileSync(file),{headers:{'Content-Type':mime,'Cache-Control':'no-store'}});
+}}};
+const port=Number(process.env.PORT||4190);
+createServer(async(req,res)=>{try{const chunks=[];let size=0;for await(const c of req){size+=c.length;if(size>6000000){res.writeHead(413);res.end();return;}chunks.push(c);}const method=req.method;
+ const request=new Request('http://127.0.0.1:'+port+req.url,{method,headers:req.headers,...(!['GET','HEAD'].includes(method)?{body:Buffer.concat(chunks)}:{})});
+ const result=await worker.fetch(request,env,{waitUntil:p=>p.catch(()=>{})});res.writeHead(result.status,Object.fromEntries(result.headers));res.end(Buffer.from(await result.arrayBuffer()));
+}catch{res.writeHead(500);res.end('Local server error');}}).listen(port,'127.0.0.1',()=>console.log(`Lexiday account preview: http://127.0.0.1:${port}`));

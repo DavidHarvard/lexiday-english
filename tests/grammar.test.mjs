@@ -1,0 +1,32 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {lessons,units,questionMap,initialGrammar,lessonRecord,unitReady,openLesson,openExam,activeRecord,startPractice,choose,submit,advance,retry,nextTarget,validateGrammar} from '../dist/grammar-model.js';
+const prep=(s,id='g1')=>{openLesson(s,id);lessonRecord(s,id).step=2;startPractice(s)};
+function finish(s,wrong=false){const x=activeRecord(s).session;while(!x.finished){const q=questionMap[x.questions[x.index]];choose(s,wrong?(q.answer+1)%q.options.length:q.answer);submit(s);advance(s)}}
+test('16 beginner lessons, 4 units, 144 unique validated questions',()=>{assert.equal(lessons.length,16);assert.equal(units.length,4);assert.equal(Object.keys(questionMap).length,144);for(const l of lessons){assert.equal(l.examples.length,2);assert.equal(l.practice.length,2);for(const q of [...l.practice,l.exam]){assert.equal(new Set(q.options).size,q.options.length);assert.ok(q.answer>=0&&q.answer<q.options.length);assert.ok(q.explanation)}}});
+test('reading never passes lesson or unlocks exams',()=>{const s=initialGrammar();openLesson(s,'g1');assert.throws(()=>startPractice(s));s.lessons.g1.step=2;assert.equal(s.lessons.g1.passed,false);assert.equal(unitReady(s,'u1'),false);assert.throws(()=>openExam(s,'u1'))});
+test('resume exact lesson and explanation step through JSON',()=>{const s=initialGrammar();openLesson(s,'g8');s.lessons.g8.step=1;const r=validateGrammar(JSON.parse(JSON.stringify(s)));assert.equal(r.cursor.id,'g8');assert.equal(r.lessons.g8.step,1);assert.equal(r.view,'lesson')});
+test('choice and submitted feedback survive refresh; repeat submit rejected',()=>{let s=initialGrammar();prep(s);choose(s,1);s=validateGrammar(JSON.parse(JSON.stringify(s)));assert.equal(activeRecord(s).session.choice,1);submit(s);s=validateGrammar(JSON.parse(JSON.stringify(s)));assert.equal(activeRecord(s).session.answers.length,1);assert.throws(()=>submit(s));assert.throws(()=>choose(s,0));advance(s);assert.equal(activeRecord(s).session.index,1);assert.equal(activeRecord(s).session.choice,null)});
+test('cannot skip unanswered question or submit without selection',()=>{const s=initialGrammar();prep(s);assert.throws(()=>submit(s));assert.throws(()=>advance(s));assert.throws(()=>choose(s,9));assert.throws(()=>retry(s))});
+test('wrong attempt not passed; new set passes without falsely resolving old mistakes',()=>{const s=initialGrammar();prep(s);finish(s,true);assert.equal(s.lessons.g1.passed,false);assert.equal(Object.keys(s.mistakes).length,2);retry(s);finish(s);assert.equal(s.lessons.g1.passed,true);assert.equal(s.lessons.g1.attempts.length,2);assert.ok(Object.values(s.mistakes).every(m=>!m.resolved));validateGrammar(s)});
+test('exam unlocks only after four passed lessons; recommend exam',()=>{const s=initialGrammar();for(const l of lessons.slice(0,4)){prep(s,l.id);finish(s)}assert.equal(unitReady(s,'u1'),true);assert.deepEqual(nextTarget(s),{type:'exam',id:'u1'});openExam(s,'u1');assert.equal(activeRecord(s).session.questions.length,4);finish(s);assert.equal(s.exams.u1.passed,true);assert.deepEqual(nextTarget(s),{type:'lesson',id:'g5'});validateGrammar(s)});
+test('stage needs 3/4; historical passed record survives a later failure',()=>{const s=initialGrammar();for(const l of lessons.slice(0,4)){prep(s,l.id);finish(s)}openExam(s,'u1');let q=questionMap[activeRecord(s).session.questions[0]];choose(s,(q.answer+1)%3);submit(s);advance(s);finish(s);assert.equal(s.exams.u1.passed,true);assert.equal(s.exams.u1.attempts[0].score,3);retry(s);finish(s,true);assert.equal(s.exams.u1.passed,true);assert.equal(s.exams.u1.attempts[1].passed,false)});
+test('completed exam and next topic restore without starting over',()=>{const s=initialGrammar();for(const l of lessons){prep(s,l.id);finish(s)}for(const u of units){openExam(s,u.id);finish(s)}assert.equal(nextTarget(s),null);const r=validateGrammar(JSON.parse(JSON.stringify(s)));assert.equal(activeRecord(r).session.finished,true);assert.equal(Object.keys(r.lessons).length,16)});
+test('invalid backup and forged answer rejected without mutating original',()=>{const s=initialGrammar();prep(s);const r=JSON.parse(JSON.stringify(s));r.lessons.g1.passed=true;assert.throws(()=>validateGrammar(r));assert.equal(s.lessons.g1.passed,false);const broken=JSON.parse(JSON.stringify(s));broken.lessons.g1.session.questions=['not-a-question'];assert.throws(()=>validateGrammar(broken));assert.throws(()=>validateGrammar({}));choose(s,0);submit(s);s.lessons.g1.session.answers[0].correct=!s.lessons.g1.session.answers[0].correct;assert.throws(()=>validateGrammar(s))});
+
+ test('all lesson and stage retries change every question and preserve exact resumed answers',()=>{
+ const s=initialGrammar();
+ for(const l of lessons){prep(s,l.id);const seen=new Set();for(let round=0;round<4;round++){
+ const x=activeRecord(s).session;const ids=[...x.questions];if(round<3){for(const id of ids){assert.ok(!seen.has(id));seen.add(id);}}
+ choose(s,questionMap[ids[0]].answer);submit(s);const restored=validateGrammar(JSON.parse(JSON.stringify(s)));assert.deepEqual(activeRecord(restored).session,x);
+ advance(s);finish(s);assert.equal(activeRecord(s).passed,true);const prev=[...x.questions];retry(s);assert.ok(activeRecord(s).session.questions.every(id=>!prev.includes(id)));
+ }}
+ for(const u of units){openExam(s,u.id);const seen=new Set();for(let round=0;round<3;round++){const ids=[...activeRecord(s).session.questions];for(const id of ids){assert.ok(!seen.has(id));seen.add(id);assert.equal(questionMap[id].type,'exam');}finish(s);retry(s);validateGrammar(JSON.parse(JSON.stringify(s)));}}
+ });
+ test('legacy sessions remain valid; foreign, mixed and forged retry sets are rejected',()=>{
+ const s=initialGrammar();prep(s);delete activeRecord(s).session.round;validateGrammar(s);finish(s);retry(s);assert.equal(activeRecord(s).session.round,1);
+ for(const round of [-1,0.5,null,99]){const bad=structuredClone(s);activeRecord(bad).session.round=round;assert.throws(()=>validateGrammar(bad));}
+ const mixed=structuredClone(s);activeRecord(mixed).session.questions[0]='q2-r1-1';assert.throws(()=>validateGrammar(mixed));
+ });
+ test('every question has unique content, valid choices and an explanation',()=>{
+ const prompts=new Set();for(const q of Object.values(questionMap)){assert.ok(!prompts.has(q.prompt),q.id);prompts.add(q.prompt);assert.equal(new Set(q.options).size,q.options.length);assert.ok(Number.isInteger(q.answer)&&q.answer>=0&&q.answer<q.options.length);assert.ok(q.explanation);}
+ });

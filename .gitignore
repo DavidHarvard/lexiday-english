@@ -1,0 +1,11 @@
+.env
+.env.local
+.sites-runtime/
+node_modules/
+.DS_Store
+
+/outputs/
+.local/
+.wrangler/
+.dev.vars
+wrangler.jsonc

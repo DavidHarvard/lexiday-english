@@ -1,0 +1,235 @@
+accommodation-n-1|a place where someone can stay or live
+tenant-n-1|a person who pays rent to use a home or building
+landlord-n-1|a person who rents a property to someone else
+deposit-n-1|money paid as security and sometimes returned later
+deposit-v-2|to put money into a bank account
+lease-n-1|an agreement to rent property for a period of time
+maintenance-n-1|work that keeps something in good condition
+furnished-adj-1|provided with furniture
+spacious-adj-1|having plenty of space
+residential-adj-1|used mainly for homes
+neighbourhood-n-1|the area around where people live
+commute-v-1|to travel regularly between home and work
+fare-n-1|the price of a journey on public transport
+route-n-1|a way from one place to another
+delay-n-1|a period of waiting beyond the expected time
+departure-n-1|the act of leaving a place
+arrival-n-1|the act of reaching a place
+platform-n-1|the area beside a railway track where passengers wait
+platform-n-2|an online system where people can use services or share information
+luggage-n-1|bags and cases taken on a journey
+reservation-n-1|an arrangement to keep a room or seat for someone
+accessible-adj-1|easy to reach or enter
+refund-n-1|money returned after a purchase
+receipt-n-1|a document showing that something has been paid for
+warranty-n-1|a promise to repair or replace a product if it fails
+purchase-v-1|to buy something
+discount-n-1|a reduction in the usual price
+delivery-n-1|the act of bringing goods to someone
+complaint-n-1|a statement that something is wrong or unsatisfactory
+replacement-n-1|something used instead of another thing
+affordable-adj-1|not too expensive for someone to buy
+reliable-adj-1|able to be trusted to work well
+vacancy-n-1|a job that is available
+applicant-n-1|a person who formally asks for a job or place
+qualification-n-1|a skill or official achievement needed for a job
+experience-n-1|knowledge gained by doing work or activities
+experience-n-2|an event that someone has lived through
+reference-n-1|a statement about a person's suitability for a job
+reference-n-2|the act of looking at information for help
+interview-n-1|a meeting to assess someone for a job
+recruit-v-1|to find people to join an organisation
+salary-n-1|regular pay received for a job
+contract-n-1|a formal agreement between people or organisations
+probation-n-1|a trial period at the beginning of a job
+colleague-n-1|someone you work with
+supervisor-n-1|a person who oversees other people's work
+deadline-n-1|the latest time by which something must be completed
+shift-n-1|a scheduled period of work
+shift-v-2|to move or change position or direction
+overtime-n-1|time spent working beyond normal hours
+training-n-1|practice and instruction to develop skills
+procedure-n-1|an established series of steps for doing something
+responsibility-n-1|a duty to deal with something
+flexible-adj-1|able to change to suit different needs
+efficient-adj-1|working well without wasting time or resources
+appointment-n-1|an arrangement to meet at a particular time
+symptom-n-1|a sign of an illness
+prescription-n-1|a doctor's written instruction for medicine
+treatment-n-1|medical care given to help someone get better
+recovery-n-1|the process of becoming healthy again
+nutrition-n-1|the food and nutrients needed for health
+allergy-n-1|a harmful physical reaction to a normally harmless substance
+prevent-v-1|to stop something from happening
+physical-adj-1|relating to the body
+mental-adj-1|relating to the mind
+curriculum-n-1|the subjects and content taught in a course
+assignment-n-1|a piece of work given to a student
+assessment-n-1|the process of judging knowledge or performance
+scholarship-n-1|money awarded to support someone's education
+literacy-n-1|the ability to read and write
+attendance-n-1|being present at a class or event
+tuition-n-1|teaching or instruction
+vocational-adj-1|relating to skills needed for a job
+practical-adj-1|useful in real situations
+independent-adj-1|able to act without relying on others
+budget-n-1|a plan for how much money to spend
+income-n-1|money that someone earns or receives
+expense-n-1|money spent on something
+savings-n-1|money kept for future use
+debt-n-1|money that is owed
+instalment-n-1|one of several payments for something
+insurance-n-1|an arrangement that provides financial protection against certain losses
+transfer-v-1|to move money or something else from one place to another
+withdraw-v-1|to take money out of an account
+fee-n-1|money charged for a service
+community-n-1|a group of people sharing a place or interests
+volunteer-n-1|a person who offers to help without being paid
+resident-n-1|a person who lives in a particular place
+facility-n-1|a place or piece of equipment provided for a purpose
+permission-n-1|approval to do something
+regulation-n-1|an official rule
+application-n-1|a formal request for something
+application-n-2|a computer program designed for a particular task
+eligible-adj-1|meeting the conditions required for something
+available-adj-1|able to be obtained or used
+convenient-adj-1|suitable and easy to use
+enquire-v-1|to ask for information
+request-v-1|to ask for something
+confirm-v-1|to establish that something is correct or definite
+clarify-v-1|to make something easier to understand
+apologise-v-1|to say that you are sorry
+appreciate-v-1|to feel grateful for something
+recommend-v-1|to suggest that something is suitable or worth doing
+arrange-v-1|to organise or plan something
+postpone-v-1|to move an event to a later time
+resolve-v-1|to find a solution to a problem
+sustainable-adj-1|able to continue without exhausting resources
+renewable-adj-1|able to be naturally replaced
+emission-n-1|the release of gas or other substances
+pollution-n-1|harmful substances introduced into the environment
+conservation-n-1|the protection and careful use of natural resources
+biodiversity-n-1|the variety of living things in an area
+habitat-n-1|the natural home of an animal or plant
+resource-n-1|something useful that can meet a need
+consumption-n-1|the use of goods or resources
+recycle-v-1|to process used materials so they can be used again
+infrastructure-n-1|the basic systems and structures a society needs
+congestion-n-1|a condition in which traffic cannot move freely
+urbanisation-n-1|the growth of towns and cities
+pedestrian-n-1|a person walking rather than travelling in a vehicle
+communal-adj-1|shared by a group of people
+rural-adj-1|relating to the countryside
+density-n-1|the amount of something in a given space
+expand-v-1|to become or make something larger
+renovate-v-1|to repair and improve an old building
+allocate-v-1|to give a share of something for a purpose
+employment-n-1|the state of having paid work
+productivity-n-1|the amount produced in relation to the resources used
+incentive-n-1|something that encourages action
+investment-n-1|money or effort put into something for a future benefit
+revenue-n-1|money received by a business or government
+inflation-n-1|a general rise in prices
+inequality-n-1|an unfair difference in opportunities or conditions
+poverty-n-1|the condition of having too little money for basic needs
+prosperity-n-1|a condition of wealth and success
+redundancy-n-1|job loss because the position is no longer needed
+innovation-n-1|the development of new ideas or methods
+automation-n-1|the use of machines to carry out work automatically
+privacy-n-1|freedom from unwanted attention or access to personal information
+security-n-1|protection from danger or unauthorised access
+algorithm-n-1|a set of steps for solving a problem
+misinformation-n-1|false or inaccurate information
+digital-adj-1|using electronic data represented by numbers
+remote-adj-1|far away or carried out from a distance
+virtual-adj-1|created or experienced through computer systems
+adopt-v-1|to begin using a method or idea
+diversity-n-1|the existence of different kinds of people or things
+heritage-n-1|traditions and valued things passed down from the past
+tradition-n-1|a custom passed from one generation to another
+identity-n-1|who someone is or how they understand themselves
+integration-n-1|the process of bringing different parts or people together
+isolation-n-1|the state of being separated from others
+generation-n-1|people born around the same time
+migration-n-1|movement from one place to live in another
+inclusion-n-1|giving people opportunities to take part
+cohesion-n-1|the strength that keeps a group united
+policy-n-1|a plan or rule guiding decisions
+legislation-n-1|laws or the process of making laws
+subsidy-n-1|money provided to support an activity
+taxation-n-1|the system of collecting taxes
+welfare-n-1|people's wellbeing or support provided for those in need
+regulate-v-1|to control an activity through rules
+enforce-v-1|to make sure a rule is obeyed
+prohibit-v-1|to officially forbid something
+priority-n-1|something that needs attention before other things
+participation-n-1|the act of taking part
+evidence-n-1|information that supports a belief or conclusion
+research-n-1|careful study to discover information
+survey-n-1|a study that gathers people's answers or observations
+sample-n-1|a small part used to represent a larger group
+method-n-1|a way of doing something
+analysis-n-1|careful examination of the parts of something
+factor-n-1|something that influences a result
+trend-n-1|a general direction of change
+proportion-n-1|the share of a whole represented by a part
+interpret-v-1|to explain the meaning of something
+significant-adj-1|important or large enough to matter
+relevant-adj-1|connected to the subject being considered
+valid-adj-1|based on sound reasoning or evidence
+objective-adj-1|based on facts rather than personal feelings
+objective-n-2|a goal to be achieved
+bias-n-1|a preference or prejudice that affects judgement
+assumption-n-1|something accepted as true without proof
+justify-v-1|to give good reasons for something
+evaluate-v-1|to judge the quality or value of something
+acknowledge-v-1|to accept or recognise that something is true
+conclude-v-1|to reach a judgement after considering information
+consequence-n-1|a result of an action or situation
+impact-n-1|a strong effect on something
+impact-v-2|to affect something
+contribute-v-1|to help bring about a result
+undermine-v-1|to weaken something gradually
+alleviate-v-1|to make a problem or suffering less severe
+exacerbate-v-1|to make a problem worse
+mitigate-v-1|to reduce the harmful effects of something
+address-v-1|to deal with a problem or issue
+address-n-2|information showing where a person or place can be found
+implement-v-1|to put a plan into action
+feasible-adj-1|possible to do successfully
+advantage-n-1|a useful or favourable feature
+drawback-n-1|a disadvantage or problem
+alternative-n-1|another available choice
+approach-n-1|a way of dealing with something
+approach-v-2|to move closer to something
+beneficial-adj-1|having a helpful effect
+detrimental-adj-1|causing harm
+essential-adj-1|absolutely necessary
+sufficient-adj-1|enough for a purpose
+appropriate-adj-1|suitable for a situation
+whereas-conj-1|used to contrast two facts
+light-n|the brightness that makes things visible
+light-adj|not heavy
+bright-adj|giving or receiving plenty of light
+sound-n|something that can be heard
+book-n|a set of written or printed pages
+book-v|to arrange to have a room or ticket in advance
+read-v|to understand written words
+learn-v|to gain knowledge or a skill
+write-v|to produce words in written form
+share-v|to use or enjoy something together with others
+plan-n|an intended course of action
+plan-v|to decide what to do in the future
+travel-v|to go from one place to another
+journey-n|an act of travelling from one place to another
+notice-v|to become aware of something
+discover-v|to find something previously unknown
+change-v|to become or make something different
+shot-n-fire|the firing of a gun or the sound it makes
+shot-n-drink|a small serving of strong alcoholic drink
+shot-v|recorded pictures or video with a camera
+aim-n|a result that someone wants to achieve
+hinder-v|to make progress or an action more difficult
+hinge-n|a joint that allows a door to swing open
+ defect-n|a fault in something
+deficient-adj|not having enough of something

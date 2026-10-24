@@ -1,0 +1,35 @@
+{
+ "synonyms": [
+  ["purchase,buy","购买","purchase 比 buy 更正式，常见于交易或文件。"],
+  ["postpone,delay,defer","推迟","postpone/defer 常指主动推迟安排；delay 还可表示意外延误。"],
+  ["resolve,solve,address","处理问题","solve 强调得到答案，resolve 强调解决争议或困难；address 强调着手处理，不保证已解决。仅对应动词义，不对应地址。"],
+  ["hinder,hamper,impede,obstruct","阻碍","hinder/hamper 强调影响进展，impede 较正式，obstruct 常指挡住通道或妨碍行动。"],
+  ["significant,important,major","重要","significant 可强调影响或意义；major 强调主要或重大的，不能处处互换。"],
+  ["sufficient,adequate,enough","足够","sufficient/enough 表数量足够；adequate 也强调达到要求。"],
+  ["scarce,rare,uncommon","稀少","scarce 强调供应不足；rare/uncommon 强调不常见。"],
+  ["rapid,quick,fast","快","rapid 常描述变化或发展速度；quick 可描述反应；fast 常描述移动速度。"],
+  ["expand,enlarge,extend","扩大","expand 强调规模增长，enlarge 常指尺寸变大，extend 常指范围或长度延伸。"],
+  ["reduce,decrease,diminish","减少","reduce 常表示主动减少，decrease 表数量下降，diminish 也可描述影响或重要性减弱。"],
+  ["beneficial,helpful,useful","有益","beneficial 强调带来好处，helpful 强调提供帮助，useful 强调有用途。"],
+  ["detrimental,harmful,damaging","有害","detrimental 较正式，常接 to；damaging 强调造成损害。"],
+  ["feasible,possible,practical","可行","possible 只表示可能；feasible 强调可实施；practical 还强调实际实用。"],
+  ["essential,necessary,vital","必要","essential/vital 强调不可或缺，necessary 表必要。"],
+  ["income,revenue,earnings","收入","income 泛指收入，revenue 常指机构营业收入，earnings 常指工资或利润。"],
+  ["method,approach,technique","方法","method 指方法步骤，approach 指处理思路，technique 常指具体技巧。"],
+  ["assess,evaluate,appraise","评估","assess 可评估程度或风险，evaluate 评价价值或成效，appraise 常见于价值或绩效评定。"],
+  ["preserve,conserve,protect","保护","preserve 保持原貌，conserve 强调节约或保护资源，protect 强调免受伤害。"],
+  ["prohibit,forbid,ban","禁止","prohibit 较正式，ban 常为官方禁令，forbid 也用于个人禁止。"],
+  ["obtain,acquire,gain","获得","obtain 指得到，acquire 可指逐渐获得能力或财产，gain 常指通过努力获得。"],
+  ["apparent,obvious,evident","明显","apparent 也可能只是表面看来如此；obvious/evident 强调容易看出。"],
+  ["alleviate,mitigate,relieve","缓解","alleviate/relieve 常用于痛苦或压力，mitigate 常用于减轻负面后果。"],
+  ["reliable,dependable,trustworthy","可靠","reliable/dependable 可指人或事物表现稳定；trustworthy 强调值得信任。"],
+  ["drawback,disadvantage,shortcoming","缺点","drawback/disadvantage 指不利之处，shortcoming 常指能力或表现的不足。"],
+  ["enquire,inquire,ask","询问","enquire/inquire 较正式，ask 用途更广；后接结构也可能不同。"],
+  ["confirm,verify,check","核实","confirm 确认已知信息，verify 核验真实性，check 泛指检查。"],
+  ["objective,aim,goal","目标","仅对应 objective 的名词义；aim 常指意图，goal 常指具体希望实现的结果。"],
+  ["gift,present","礼物","仅对应名词 present；gift 还可表示天赋，present 也可作形容词和动词。"]
+ ],
+ "families": [
+  "act,action,active,activity,activate", "apply,applicant,application", "employ,employee,employer,employment,unemployment", "educate,education,educational", "inform,information,informative", "decide,decision,decisive", "produce,product,production,productive,productivity", "consume,consumer,consumption", "pollute,pollution,pollutant", "conserve,conservation,conservative", "protect,protection,protective", "regulate,regulation,regulator", "participate,participation,participant", "migrate,migration,immigration,immigrant", "integrate,integration,integrated", "isolate,isolation,isolated", "include,inclusion,inclusive", "diverse,diversity,diversify", "tradition,traditional,traditionally", "innovate,innovation,innovative", "automate,automation,automatic", "invest,investment,investor", "qualify,qualification,qualified", "recover,recovery", "maintain,maintenance", "reside,resident,residential,residence", "refer,reference", "assess,assessment", "evaluate,evaluation", "analyse,analysis,analytical", "interpret,interpretation,interpreter", "depend,dependent,independent,dependence,independence", "sustain,sustainable,sustainability", "renew,renewable,renewal", "permit,permission", "prevent,prevention,preventive", "recommend,recommendation", "arrange,arrangement", "develop,development,developer", "discover,discovery", "deficient,deficiency", "efficient,efficiency", "present,presentation", "create,creation,creative,creativity", "construct,construction,constructive", "communicate,communication", "relate,relation,relationship", "benefit,beneficial", "prosper,prosperous,prosperity", "dense,density", "vary,variety,various,variation", "argue,argument", "guide,guidance", "equal,equality,equity", "lead,leader,leadership", "nature,natural,naturally", "electric,electrical,electricity,electronic", "occupy,occupation", "respond,response,responsible,responsibility"
+ ]
+}

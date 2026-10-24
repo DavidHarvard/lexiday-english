@@ -1,0 +1,26 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import worker from '../server/worker.js';
+import {database} from '../server/local-db.mjs';
+import {initial} from '../dist/engine.js';
+import {initialGrammar} from '../dist/grammar-model.js';
+import * as store from '../dist/account-store.js';
+test('client: guest separation, scoped cache, offline recovery, in-flight edits and explicit conflict resolution',async()=>{
+ const map=new Map();globalThis.localStorage={getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,v),removeItem:k=>map.delete(k)};
+ const env={DB:database(),AUTH_PEPPER:'test-only-client-secret-long-enough-1234'};let cookie='',offline=false,hook=null;
+ globalThis.fetch=async(path,options={})=>{if(offline)throw Error('offline');const r=await worker.fetch(new Request('https://example.test'+path,{...options,headers:{...options.headers,'Origin':'https://example.test','Cookie':cookie,'CF-Connecting-IP':'client-test'}}),env,{});if(r.headers.get('set-cookie'))cookie=r.headers.get('set-cookie').split(';')[0];if(hook&&path.includes('/progress/')){const h=hook;hook=null;h();}return r;};
+ const guest=initial();guest.plan.count=17;store.writeState('lexiday.v1',JSON.stringify(guest));
+ await store.initAccount();assert.equal(store.accountState().user,null);
+ await store.api('register','POST',{username:'alice',password:'a long client test password'});await store.initAccount();
+ assert.equal(store.readState('lexiday.v1'),null);assert.equal(store.guestData().words.plan.count,17);
+ await store.importGuest();assert.equal((await store.api('session')).progress.words.data.plan.count,17);
+ let data=initial();data.plan.count=8;offline=true;store.writeState('lexiday.v1',JSON.stringify(data));await store.syncNow();assert.ok(store.accountState().pending.includes('words'));assert.equal(JSON.parse(store.readState('lexiday.v1')).plan.count,8);
+ offline=false;await store.syncNow();assert.equal((await store.api('session')).progress.words.data.plan.count,8);assert.equal(store.accountState().pending.length,0);
+ data.plan.count=9;store.writeState('lexiday.v1',JSON.stringify(data));hook=()=>{data.plan.count=10;store.writeState('lexiday.v1',JSON.stringify(data));};await store.syncNow();assert.equal(JSON.parse(store.readState('lexiday.v1')).plan.count,10);assert.ok(store.accountState().pending.includes('words'));await store.syncNow();assert.equal((await store.api('session')).progress.words.data.plan.count,10);
+ const remote=await store.api('session');data.plan.count=11;await store.api('progress/words','PUT',{revision:remote.progress.words.revision,data});data.plan.count=12;store.writeState('lexiday.v1',JSON.stringify(data));await store.syncNow();assert.deepEqual(store.accountState().conflicts,['words']);assert.equal((await store.api('session')).progress.words.data.plan.count,11);
+ await store.resolveConflict('words',true);assert.equal((await store.api('session')).progress.words.data.plan.count,12);
+ store.writeState('lexiday.grammar.v1',JSON.stringify(initialGrammar()));await store.syncNow();assert.equal((await store.api('session')).progress.grammar.revision,1);
+ await store.api('logout','POST',{});await store.initAccount();assert.equal(store.accountState().user,null);assert.equal(JSON.parse(store.readState('lexiday.v1')).plan.count,17);
+ await store.api('register','POST',{username:'bob',password:'another long client test password'});await store.initAccount();assert.equal(store.readState('lexiday.v1'),null);assert.equal(store.readState('lexiday.grammar.v1'),null);
+ await store.syncNow();env.DB.close();
+});
