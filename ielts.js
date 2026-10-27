@@ -38,7 +38,7 @@ function fullPlan() {
 }
 function listening() {
  queueMicrotask(()=>mountListening(document.getElementById('listening-workspace'),state.notes,save));
- return top('听清楚，再核对。','Cambridge IELTS 4 · 在线音频 · 听写与答案自动保存')+`<div class="i-grid"><section class="panel"><div class="section-heading"><h2>精听工作台</h2>${pill('16 段在线材料')}</div><div id="listening-workspace" aria-label="听力练习"><p class="muted">正在加载听力材料…</p></div></section><aside><section class="panel"><h2>一次精听的顺序</h2><ol class="i-flow"><li>首次做题，不看原文</li><li>问题片段，听写 2–3 次</li><li>点击按钮，核对英文原文</li><li>跟读，再脱稿复述</li><li>次日不看文本重听</li></ol>${nav('ielts-review','记录整套听力分数')}</section>${errorForm('listening')}</aside></div>${recentEntries('listening')}`;
+ return top('听清楚，再核对。','Cambridge IELTS 4 · 在线音频 · 答案与备注自动关联材料')+`<div class="i-grid"><section class="panel"><div class="section-heading"><h2>精听工作台</h2>${pill('16 段在线材料')}</div><div id="listening-workspace" aria-label="听力练习"><p class="muted">正在加载听力材料…</p></div></section><aside><section class="panel" id="listening-note-workspace" aria-label="音频备注"></section></aside></div>`;
 }
 
 function writing() {

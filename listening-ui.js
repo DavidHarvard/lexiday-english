@@ -1,4 +1,4 @@
-import {listeningKey,saveListeningPosition} from './listening-model.js';
+import {listeningKey,saveListeningPosition,checkListeningAnswers,LISTENING_ANSWERS,saveListeningNote} from './listening-model.js';
 let catalogPromise;
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function getCatalog(){
@@ -13,9 +13,6 @@ export async function mountListening(host,notes,save){
   function select(id){
    const track=tracks.find(t=>t.id===id)||tracks[0], key=field=>listeningKey(track.id,field);
    notes['listening:selected']=track.id;
-   // Keep old unscoped dictation in the backup; new exercises are isolated.
-   if(!notes['listening:legacy-migrated']&&notes['listen-dictation'])notes[key('dictation')]=notes['listen-dictation'];
-   notes['listening:legacy-migrated']='true';
    const revision=++generation;
    const position=Number(notes[key('position')])||0;
    saveListeningPosition(notes,track,position);save();
@@ -23,27 +20,45 @@ export async function mountListening(host,notes,save){
     <audio id="i-audio" controls preload="metadata" src="${track.audio}"></audio>
     <div class="i-audio-controls"><button type="button" id="listening-rewind">后退 5 秒</button><label>播放速度<select id="listening-rate"><option value="1">1× 正常</option><option value="0.85">0.85× 辅助</option><option value="1.1">1.1×</option></select></label><a href="${track.audio}" download="${track.filename}">下载音频</a></div>
     <p class="fine" id="listening-audio-error" role="status"></p>
-    <label for="listening-source">材料与时间点 · 自动记录</label><input id="listening-source" readonly value="${escape(notes['listen-source'])}">
-    <label for="listening-dictation">不看原文，先听写</label><textarea id="listening-dictation" rows="5" placeholder="写下听到的内容，不确定处用 […] 标记。">${escape(notes[key('dictation')])}</textarea>
     <button type="button" id="listening-transcript-button" aria-expanded="false" aria-controls="listening-transcript">显示英文原文</button>
     <div id="listening-transcript" class="listening-transcript" hidden></div>
     <section class="listening-questions"><h3>对应题目 · Questions ${(track.part-1)*10+1}–${track.part*10}</h3><p class="fine">填空题输入英文或数字；选择与配对题输入原题字母，多选题按提示填写。答案自动保存。</p>
     <details class="listening-original"><summary>查看完整原题、选项与图表</summary>${track.pages.map((p,i)=>`<img src="${p}" alt="Test ${track.test} Section ${track.part} 原题，第 ${i+1} 页" loading="lazy">`).join('')}</details>
-    ${track.questions.map(q=>`<label class="listening-answer" for="listening-answer-${q.number}"><span><b>${q.number}.</b> ${escape(q.prompt)}</span><input id="listening-answer-${q.number}" data-listening-answer="${q.number}" autocomplete="off" maxlength="300" value="${escape(notes[key('answer-'+q.number)])}" aria-label="第 ${q.number} 题答案"></label>`).join('')}</section>`;
-   const audio=host.querySelector('audio'),source=host.querySelector('#listening-source');
-   const reviewSource=document.querySelector('form[data-skill="listening"] input[name="source"]');
-   if(reviewSource){reviewSource.value=notes['listen-source'];reviewSource.readOnly=true;}
-   const remember=()=>{if(revision!==generation)return;saveListeningPosition(notes,track,audio.currentTime);source.value=notes['listen-source'];if(reviewSource)reviewSource.value=notes['listen-source'];save();};
+    ${track.questions.map(q=>`<div><label class="listening-answer" for="listening-answer-${q.number}"><span><b>${q.number}.</b> ${escape(q.prompt)}</span><input id="listening-answer-${q.number}" data-listening-answer="${q.number}" autocomplete="off" maxlength="300" value="${escape(notes[key('answer-'+q.number)])}" aria-describedby="listening-feedback-${q.number}" aria-label="第 ${q.number} 题答案"></label><p id="listening-feedback-${q.number}" class="listening-feedback" hidden></p></div>`).join('')}
+    ${LISTENING_ANSWERS[track.id]?'<button type="button" id="listening-check" class="primary">检验答案</button><p id="listening-score" role="status" aria-live="polite"></p>':'<p class="fine">此段暂未提供标准答案，可填写保存，暂不自动判分。</p>'}</section>`;
+   const audio=host.querySelector('audio');
+   const remember=()=>{if(revision!==generation)return;saveListeningPosition(notes,track,audio.currentTime);save();};
    audio.addEventListener('loadedmetadata',()=>{if(position>0&&position<audio.duration)audio.currentTime=position;});
    let last=-1;
    audio.addEventListener('timeupdate',()=>{const second=Math.floor(audio.currentTime);if(second!==last){last=second;remember();}});
    for(const name of ['play','pause','seeked','ended'])audio.addEventListener(name,remember);
-   audio.addEventListener('error',()=>{host.querySelector('#listening-audio-error').textContent='音频加载失败，请检查网络后重新选择材料。已保存的听写和答案仍保留。';});
+   audio.addEventListener('error',()=>{host.querySelector('#listening-audio-error').textContent='音频加载失败，请检查网络后重新选择材料。已保存的备注和答案仍保留。';});
    host.querySelector('#listening-track').onchange=e=>{remember();audio.pause();select(e.target.value);};
    host.querySelector('#listening-rewind').onclick=()=>{audio.currentTime=Math.max(0,audio.currentTime-5);};
    host.querySelector('#listening-rate').onchange=e=>{audio.playbackRate=Number(e.target.value);};
-   host.querySelector('#listening-dictation').oninput=e=>{notes[key('dictation')]=e.target.value;save();};
-   host.querySelectorAll('[data-listening-answer]').forEach(el=>el.oninput=()=>{notes[key('answer-'+el.dataset.listeningAnswer)]=el.value;save();});
+   host.querySelectorAll('[data-listening-answer]').forEach(el=>el.oninput=()=>{
+    notes[key('answer-'+el.dataset.listeningAnswer)]=el.value;save();
+    host.querySelectorAll('.listening-feedback').forEach(p=>p.hidden=true);
+    host.querySelectorAll('[data-listening-answer]').forEach(input=>input.removeAttribute('aria-invalid'));
+    const score=host.querySelector('#listening-score');if(score)score.textContent='答案已更新，点击“检验答案”重新核对。';
+   });
+   const check=host.querySelector('#listening-check');
+   if(check)check.onclick=()=>{
+    const result=checkListeningAnswers(track.id,track.questions.map(q=>notes[key('answer-'+q.number)]));
+    for(const row of result.results){const feedback=host.querySelector('#listening-feedback-'+row.number),input=host.querySelector('#listening-answer-'+row.number);feedback.hidden=false;feedback.className='listening-feedback '+(row.correct?'correct':'incorrect');feedback.textContent=row.correct?'✓ 正确':`${row.answered?'✗ 不正确':'尚未作答'} · 参考答案：${row.expected}`;input.setAttribute('aria-invalid',String(!row.correct));}
+    host.querySelector('#listening-score').textContent=`答对 ${result.correct} / ${result.total} 题`;
+   };
+   const noteHost=document.getElementById('listening-note-workspace');
+   if(noteHost){
+    noteHost.innerHTML=`<h2>没听清的内容</h2><p class="fine">${escape(track.title)}</p><label for="listening-note">记录本次没有听清的内容</label><textarea id="listening-note" rows="7" maxlength="3000" placeholder="记下没听清的词句或问题。">${escape(notes[key('note-draft')])}</textarea><button type="button" id="listening-save-note" class="primary">保存备注</button><p id="listening-note-status" role="status" aria-live="polite"></p><button type="button" id="listening-first-note" aria-expanded="false" aria-controls="listening-first-note-content" ${notes[key('first-note')]?'':'disabled'}>查看首听备注</button><div id="listening-first-note-content" class="listening-transcript" hidden></div>`;
+    const field=noteHost.querySelector('textarea'),status=noteHost.querySelector('#listening-note-status'),button=noteHost.querySelector('#listening-first-note'),panel=noteHost.querySelector('#listening-first-note-content');
+    field.oninput=()=>{notes[key('note-draft')]=field.value;save();};
+    noteHost.querySelector('#listening-save-note').onclick=()=>{
+     try{saveListeningNote(notes,track.id,field.value);save();field.value='';panel.hidden=true;button.disabled=false;button.textContent='查看首听备注';button.setAttribute('aria-expanded','false');status.textContent='备注已保存到当前音频，首听备注默认隐藏。';}
+     catch(e){status.textContent=e.message;}
+    };
+    button.onclick=()=>{panel.hidden=!panel.hidden;panel.textContent=notes[key('first-note')]||'';button.setAttribute('aria-expanded',String(!panel.hidden));button.textContent=panel.hidden?'查看首听备注':'收起首听备注';};
+   }
    let text=null,requesting=false;
    host.querySelector('#listening-transcript-button').onclick=async e=>{
     if(requesting)return;const button=e.currentTarget,panel=host.querySelector('#listening-transcript');
