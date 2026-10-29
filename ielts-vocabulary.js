@@ -386,7 +386,7 @@ export const ieltsWords=[
         "type": "词族",
         "word": "resident",
         "meaning": "居民",
-        "difference": "residential 是形容词；resident 是表示居住者的名词。"
+        "difference": "residential 强调住宅用途；resident 作名词指居民，作形容词指居住的或常驻的。"
       }
     ]
   },

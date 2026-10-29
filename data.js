@@ -1,5 +1,6 @@
 import {importedWords,importedIds,relationNotes,englishDefinitions} from './imported-vocabulary.js';
 import {ieltsWords,ieltsBasicIds,ieltsPlusIds} from './ielts-vocabulary.js';
+import {deduplicateNotes} from './word-notes.js';
 // Original demonstration material, manually reviewed; not an official exam list.
 const s=(id,pos,meaning,examples,distractors)=>({id,pos,meaning,examples:examples.map(([en,zh])=>({en,zh})),distractors});
 const w=(id,ipa,group,senses,notes=[])=>({id,word:id,ipa,group,senses,notes});
@@ -28,7 +29,7 @@ w('hinge','/hɪndʒ/','容易混淆的一组',[s('hinge-n','n.','铰链',[["The 
 w('defect','/ˈdiːfekt/','不足与改进',[s('defect-n','n.','缺陷',[["The engineer found a defect in the door.","工程师发现了门上的一个缺陷。"],["A small defect caused the machine to stop.","一个小缺陷导致机器停止运转。"],["They checked the product for a defect.","他们检查产品是否存在缺陷。"]],['优点','效果','目标'])],[n('词义关联','deficient','不足的；缺乏的','defect 是一个缺陷；deficient 描述缺乏某物，常搭配 in，不能直接互换。')]),
 w('deficient','/dɪˈfɪʃənt/','不足与改进',[s('deficient-adj','adj.','不足的；缺乏的',[["The soil is deficient in nutrients.","土壤缺乏养分。"],["A diet deficient in iron can cause problems.","缺铁的饮食可能引发问题。"],["The report was deficient in detail.","这份报告细节不足。"]],['充足的','高效的','缺陷（名词）'])],[n('词族','deficiency','不足；缺乏（名词）','deficient 是形容词；deficiency 是名词。'),n('形近词','efficient','高效的','efficient 表示效率高，与 deficient 的“缺乏”不同。')])
 ];
-for(const word of words){for(const sense of word.senses)if(englishDefinitions[sense.id])sense.definition=englishDefinitions[sense.id];word.notes=[...word.notes,...(relationNotes[word.id]||[]).filter(n=>!word.notes.some(old=>old.word===n.word&&old.type===n.type))];}
+for(const word of words){for(const sense of word.senses)if(englishDefinitions[sense.id])sense.definition=englishDefinitions[sense.id];word.notes=deduplicateNotes([...word.notes,...(relationNotes[word.id]||[])]);}
 export const wordMap=Object.fromEntries(words.map(x=>[x.id,x]));
 const names=['零基础核心词汇','小学常用词汇','中考核心词汇','高考核心词汇','大学英语四级','大学英语六级','雅思基础词汇','雅思进阶词汇','托福核心词汇','考研英语词汇','英语专业四级','英语专业八级','商务英语词汇','日常交流与旅行','GRE 高阶词汇'];
 const ids=['starter','primary','middle','high','cet4','cet6','ielts-basic','ielts-plus','toefl','postgrad','tem4','tem8','business','daily','gre'];

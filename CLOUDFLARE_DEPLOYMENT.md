@@ -60,3 +60,7 @@ Cloudflare 控制台返回 Success / deployed。无 Cookie、无 Authorization �
 ### 2026-10-23 · Unit 1 课堂
 
 隔离测试环境验证后同步主项目并发布，部署 ID `1e85e128`。81 项测试通过，正式域名资源一致性及生产 D1 Unit 1 进度同步检查通过。详情见 `UNIT1_TEST_ENVIRONMENT.md`。数据库结构与既有用户进度保持兼容。
+
+## 单词学习与全雅思例句更新（2026-10-30）
+
+发布目标为现有 lexiday-english Pages 项目与 GitHub main。新增自动朗读、听音中文输入验证、同日换例句、完全记住免复习、笔记去重及全雅思词库结构化义项。112 项测试通过；内容统计、旧进度兼容及校正来源见 [WORD_LEARNING.md](WORD_LEARNING.md)。D1 表结构与 AUTH_PEPPER 不变。

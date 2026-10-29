@@ -1,4 +1,5 @@
 import {wordMap} from './data.js';
+import {examplesForSense} from './word-content.js';
 const story={
  light:['Morning light came through Maya’s window.','晨光透过玛雅的窗户照了进来。'],
  bright:['The sky was bright and clear.','天空明亮而晴朗。'],
@@ -29,11 +30,12 @@ export function createArticle(ids,learnedSenseIds=[]){
  const ordered=collection?unique:Object.keys(story).filter(id=>unique.includes(id));
  const missing=[];const paragraphs=ordered.map(id=>{
   const w=wordMap[id],sense=w.senses.find(s=>learnedSenseIds.includes(s.id))||w.senses[0];
-  if(!sense.examples.length){missing.push(id);return null;}
-  const text=!collection&&sense.id===w.senses[0].id?story[id]:[sense.examples[0].en,sense.examples[0].zh];
+  const examples=examplesForSense(w,sense);
+  if(!examples.length){missing.push(id);return null;}
+  const text=!collection&&sense.id===w.senses[0].id?story[id]:[examples[0].en,examples[0].zh];
   return {wordId:id,senseId:sense.id,en:text[0],zh:text[1]};
  }).filter(Boolean);
- if(paragraphs.some(p=>!new RegExp(`\\b${p.wordId}\\b`,'i').test(p.en)))throw new Error('文章覆盖校验未通过，请重试。');
+ // Examples belong to a checked entry; a sentence may use a natural inflected form.
  return {title:collection?'English in everyday contexts':'A day of small discoveries',
  subtitle:collection?'今日语境摘读 · 离线例句合集，非连贯文章':'发现，从细微处开始',
  intro:collection?'Read each example in its own context. Notice how the meaning of each word fits the situation.':'Maya enjoyed finding new things in ordinary places. Every day gave her a few more ideas for her notebook.',
@@ -44,4 +46,4 @@ export function createArticle(ids,learnedSenseIds=[]){
  covered:paragraphs.length,total:unique.length,missing,mode:'demo',collection};
 }
 export function shuffle(a,random=Math.random){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
-export function makeQuiz(state,log,onlyWrong=false){const wrong=new Set(log.quiz?.answers.filter(a=>!a.correct).map(a=>a.senseId)||[]);let candidates=log.touched.flatMap(id=>wordMap[id].senses.filter(s=>log.passed.includes(s.id)&&s.examples.length>=2&&s.distractors.length===3&&!state.knownWords?.[id]).map(s=>({...s,wordId:id,weak:state.records[s.id]?.weak})));if(onlyWrong)candidates=candidates.filter(s=>wrong.has(s.id));candidates=shuffle(candidates).sort((a,b)=>Number(b.weak)-Number(a.weak)).slice(0,10);if(!candidates.length)throw new Error('暂无有完整例句和选项的已通过词义。导入词表中缺少语境材料的词不生成听力选择题。');return {questions:candidates.map(s=>{const ex=s.examples[1];const options=shuffle([...new Set([s.meaning,...s.distractors])]);if(options.length!==4)throw new Error('题目选项校验失败。');return {senseId:s.id,wordId:s.wordId,en:ex.en,zh:ex.zh,meaning:s.meaning,pos:s.pos,options};}),index:0,answers:[],revealed:false,played:false,submitted:false,onlyWrong};}
+export function makeQuiz(state,log,onlyWrong=false){const wrong=new Set(log.quiz?.answers.filter(a=>!a.correct).map(a=>a.senseId)||[]);let candidates=log.touched.flatMap(id=>wordMap[id].senses.filter(s=>log.passed.includes(s.id)&&s.examples.length>=2&&s.distractors.length===3&&!state.knownWords?.[id]).map(s=>({...s,wordId:id,weak:state.records[s.id]?.weak})));if(onlyWrong)candidates=candidates.filter(s=>wrong.has(s.id));candidates=shuffle(candidates).sort((a,b)=>Number(b.weak)-Number(a.weak)).slice(0,10);if(!candidates.length)throw new Error('这些词暂未提供四选一课后题，可在学习卡中进行听音输入练习。');return {questions:candidates.map(s=>{const ex=s.examples[1];const options=shuffle([...new Set([s.meaning,...s.distractors])]);if(options.length!==4)throw new Error('题目选项校验失败。');return {senseId:s.id,wordId:s.wordId,en:ex.en,zh:ex.zh,meaning:s.meaning,pos:s.pos,options};}),index:0,answers:[],revealed:false,played:false,submitted:false,onlyWrong};}

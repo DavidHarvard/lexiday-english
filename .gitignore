@@ -9,3 +9,6 @@ node_modules/
 .wrangler/
 .dev.vars
 wrangler.jsonc
+
+# Temporary assignments generated from the original vocabulary during authoring.
+/data/word-enrichment/input-*.json

@@ -1,8 +1,9 @@
+import {answerSense} from './word-learning-helpers.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {words,wordMap,courseMap} from '../dist/data.js';
 import {ieltsWords,ieltsBasicIds,ieltsPlusIds} from '../dist/ielts-vocabulary.js';
-import {initial,begin,answerBare,answerSense,continueLearning,leaveRest,dayLog,validateState,remainingWords} from '../dist/engine.js';
+import {initial,begin,answerBare,continueLearning,leaveRest,dayLog,validateState,remainingWords} from '../dist/engine.js';
 import {createArticle,makeQuiz} from '../dist/content.js';
 const DAY='2026-10-22';
 test('200 unique IELTS words, 210 senses, 630 examples, 20 topics and five-word groups',()=>{

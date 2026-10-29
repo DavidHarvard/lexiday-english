@@ -36,7 +36,7 @@ notes={
  'deposit':[('词义关联','instalment','分期款项','deposit 此处为可退还的租房押金；instalment 是分期支付的一笔款项。')],
  'lease':[('近义词','contract','合同','lease 专指租赁合同；contract 是更广泛的合同。')],
  'furnished':[('词族','furniture','家具','furnished 描述配备家具；furniture 是不可数名词。')],
- 'residential':[('词族','resident','居民','residential 是形容词；resident 是表示居住者的名词。')],
+ 'residential':[('词族','resident','居民','residential 强调住宅用途；resident 作名词指居民，作形容词指居住的或常驻的。')],
  'commute':[('近义词','travel','旅行；出行','commute 特指经常往返住所与工作或学习地点，travel 范围更广。')],
  'fare':[('词义关联','fee','服务费','fare 用于车船等交通票价；fee 用于课程、服务等收费。'),('形近词','fair','公平的','fare 与 fair 常同音，但拼写和含义不同。')],
  'departure':[('反义词','arrival','到达','departure 指出发，arrival 指到达；注意听力中的时间变更。')],

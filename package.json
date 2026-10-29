@@ -5,9 +5,9 @@
   "scripts": {
     "dev": "node server/dev.mjs",
     "test": "node --test tests/*.test.mjs",
-    "build": "node scripts/build-server.mjs",
+    "build": "node scripts/build-word-enrichment.mjs && node scripts/build-server.mjs",
     "dev:static": "python3 -m http.server 4173 --directory dist",
-    "deploy": "wrangler pages deploy dist --project-name lexiday-english"
+    "deploy": "npm run build && wrangler pages deploy dist --project-name lexiday-english"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",
