@@ -1,3 +1,4 @@
+import {validateReadingArticle} from './reading-model.js';
 import {scheduleReview} from './review-schedule.js';
 import {wordMap,courseMap} from './data.js';
 import {examplesForSense,studyMeaning,checkMeaning,spokenWord} from './word-content.js';
@@ -114,7 +115,7 @@ export function validateState(value){
   }
  }
  for(const record of Object.values(value.records))if(record.audioVerified!==undefined&&typeof record.audioVerified!=='boolean')throw Error('听音验证记录无效。');
- for(const [day,l] of Object.entries(value.days)){if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!['newWords','reviewWords','touched','passed'].every(k=>Array.isArray(l[k])))throw new Error('日期记录无效。');for(const k of ['newWords','reviewWords','touched'])if(l[k].some(id=>!wordMap[id]))throw new Error('词汇记录无效。');if(l.passed.some(id=>!all.has(id)))throw new Error('词义记录无效。');if(l.article&&(!Array.isArray(l.article.paragraphs)||l.article.paragraphs.some(p=>!wordMap[p.wordId]?.senses.some(s=>s.id===p.senseId))))throw new Error('阅读记录无效。');if(l.quizHistory&&(!Array.isArray(l.quizHistory)||l.quizHistory.some(q=>!Array.isArray(q.answers))))throw new Error('历史测验记录无效。');if(l.quiz&&(!Array.isArray(l.quiz.questions)||!Array.isArray(l.quiz.answers)||!Number.isInteger(l.quiz.index)||l.quiz.index<0||l.quiz.index>l.quiz.questions.length||l.quiz.questions.some(q=>!wordMap[q.wordId]?.senses.some(s=>s.id===q.senseId)||!Array.isArray(q.options)||q.options.length!==4||!q.options.includes(q.meaning))))throw new Error('测验记录无效。');}
+ for(const [day,l] of Object.entries(value.days)){if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!['newWords','reviewWords','touched','passed'].every(k=>Array.isArray(l[k])))throw new Error('日期记录无效。');for(const k of ['newWords','reviewWords','touched'])if(l[k].some(id=>!wordMap[id]))throw new Error('词汇记录无效。');if(l.passed.some(id=>!all.has(id)))throw new Error('词义记录无效。');if(l.article){if(l.article.version===2)validateReadingArticle(l.article);else if(!Array.isArray(l.article.paragraphs)||l.article.paragraphs.some(p=>!wordMap[p.wordId]?.senses.some(s=>s.id===p.senseId)))throw new Error('阅读记录无效。');}if(l.quizHistory&&(!Array.isArray(l.quizHistory)||l.quizHistory.some(q=>!Array.isArray(q.answers))))throw new Error('历史测验记录无效。');if(l.quiz&&(!Array.isArray(l.quiz.questions)||!Array.isArray(l.quiz.answers)||!Number.isInteger(l.quiz.index)||l.quiz.index<0||l.quiz.index>l.quiz.questions.length||l.quiz.questions.some(q=>!wordMap[q.wordId]?.senses.some(s=>s.id===q.senseId)||!Array.isArray(q.options)||q.options.length!==4||!q.options.includes(q.meaning))))throw new Error('测验记录无效。');}
  return value;
 }
 

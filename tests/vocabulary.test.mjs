@@ -28,14 +28,14 @@ for(const course of ['ielts-basic','ielts-plus'])test(`${course}: complete first
  assert.ok(guard>0);const restored=validateState(JSON.parse(JSON.stringify(state)));
  assert.equal(remainingWords(restored,course).length,courseMap[course].words.length-100);
  const log=dayLog(restored,DAY);assert.equal(log.touched.length,100);
- const article=createArticle(log.touched,log.passed);assert.equal(article.covered,100);assert.equal(article.collection,true);
+ const article=createArticle(log.touched,log.passed);assert.equal(article.total,100);assert.equal(article.covered+article.missing.length,100);assert.equal(article.collection,false);
  // Check every sense as a singleton, avoiding gaps caused by random ten-question sampling.
  for(const id of log.touched)for(const sense of wordMap[id].senses){
   const quiz=makeQuiz(restored,{touched:[id],passed:[sense.id]});
   assert.equal(quiz.questions.length,1);const question=quiz.questions[0];
   assert.equal(question.senseId,sense.id);assert.equal(new Set(question.options).size,4);
   assert.equal(question.options.filter(o=>o===sense.meaning).length,1);
-  assert.equal(createArticle([id],[sense.id]).paragraphs[0].senseId,sense.id);
+  const reading=createArticle([id],[sense.id]);assert.deepEqual(reading.targetWordIds,[id]);for(const g of reading.glossary)assert.equal(g.senseId,sense.id);
  }
 });
 test('new multiple meanings do not pass just because detail was shown; original IDs remain usable',()=>{
@@ -51,7 +51,7 @@ test('new multiple meanings do not pass just because detail was shown; original 
 });
 test('mixed original and IELTS reading deduplicates words and binds tested senses',()=>{
  const article=createArticle(['light','deposit','address','deposit'],['light-adj','deposit-v-2','address-n-2']);
- assert.equal(article.total,3);assert.equal(article.paragraphs.length,3);
- assert.deepEqual(article.paragraphs.map(p=>p.senseId),['light-adj','deposit-v-2','address-n-2']);
- assert.match(article.subtitle,/例句合集/);
+ assert.equal(article.total,3);assert.ok(article.paragraphs.length>=5);
+ const expected={'light':'light-adj','deposit':'deposit-v-2','address':'address-n-2'};for(const g of article.glossary)assert.equal(g.senseId,expected[g.wordId]);
+ assert.equal(article.collection,false);assert.equal(article.covered+article.missing.length,3);
 });

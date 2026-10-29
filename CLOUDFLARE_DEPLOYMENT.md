@@ -64,3 +64,7 @@ Cloudflare 控制台返回 Success / deployed。无 Cookie、无 Authorization �
 ## 单词学习与全雅思例句更新（2026-10-30）
 
 发布目标为现有 lexiday-english Pages 项目与 GitHub main。新增自动朗读、听音中文输入验证、同日换例句、完全记住免复习、笔记去重及全雅思词库结构化义项。112 项测试通过；内容统计、旧进度兼容及校正来源见 [WORD_LEARNING.md](WORD_LEARNING.md)。D1 表结构与 AUTH_PEPPER 不变。
+
+## 连贯阅读与听力交互（2026-10-30）
+
+现有 Pages 项目加入 Workers AI binding，生成有统一主题和连贯段落的每日文章；提供四篇完整双语备用故事。听力题自动播放语音问题，作答后展示原文并重播。D1 表结构与账号密钥保持不变，继续使用既有进度同步。实现与验证见 [READING_AND_QUIZ.md](READING_AND_QUIZ.md)。

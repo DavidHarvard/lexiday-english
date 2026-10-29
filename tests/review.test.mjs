@@ -17,7 +17,7 @@ test('import keeps all 3610 unique entries and full phrases, without altering ex
  assert.ok(wordMap.address.senses.some(s=>s.id==='address-n-2'));assert.equal(Object.keys(englishDefinitions).length,235);
 });
 test('imported words use enriched reading examples while preserving legacy source and progress IDs',()=>{
- const a=createArticle(['bright','emperor']);assert.equal(a.covered,2);assert.equal(a.total,2);assert.deepEqual(a.missing,[]);assert.equal(createArticle(['emperor']).covered,1);
+ const a=createArticle(['bright','emperor']);assert.equal(a.total,2);assert.equal(a.covered+a.missing.length,2);assert.ok(a.paragraphs.length>=5);assert.equal(createArticle(['emperor']).total,1);
  const s=initial();assert.throws(()=>makeQuiz(s,{touched:['emperor'],passed:['import:emperor']}));
  for(const w of importedWords){assert.equal(w.senses[0].examples.length,0);assert.ok(w.senses[0].meaning);}
 });

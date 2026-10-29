@@ -1,6 +1,7 @@
 import {validateState} from '../dist/engine.js';
 import {validateGrammar} from '../dist/grammar-model.js';
 import {validateIelts} from '../dist/ielts-model.js';
+import {prepareReadingRequest,generateReading,READING_GENERATOR_VERSION,READING_DAILY_LIMIT} from './reading.js';
 const validators={words:validateState,grammar:validateGrammar,ielts:validateIelts};
 const enc=new TextEncoder();
 const hex=b=>Array.from(new Uint8Array(b),v=>v.toString(16).padStart(2,'0')).join('');
@@ -25,11 +26,25 @@ export default {async fetch(request,env,ctx){
  const url=new URL(request.url),path=url.pathname;
  if(!path.startsWith('/api/'))return env.ASSETS.fetch(request);
  try{
-  if(!env.DB||!env.AUTH_PEPPER||env.AUTH_PEPPER.length<32)throw new HttpError(503,'账号服务尚未配置完成。访客学习仍可使用。');
+  if(!env.DB||(path!=='/api/reading'&&(!env.AUTH_PEPPER||env.AUTH_PEPPER.length<32)))throw new HttpError(503,'账号服务尚未配置完成。访客学习仍可使用。');
   if(path==='/api/health'&&request.method==='GET'){await env.DB.prepare('SELECT id FROM users LIMIT 1').first();return json({ok:true,version:'accounts-v1'});}
   if(!['GET','POST','PUT'].includes(request.method))throw new HttpError(405,'不支持此操作。');
   if(request.method!=='GET'&&request.headers.get('Origin')!==url.origin)throw new HttpError(403,'请求来源不正确，请刷新网站后重试。');
   const ip=request.headers.get('CF-Connecting-IP')||'local';
+  if(path==='/api/reading'&&request.method==='POST'){
+   let prepared;try{prepared=prepareReadingRequest(await body(request));}catch(error){throw new HttpError(400,error.message);}
+   if(!env.AI?.run)throw new HttpError(503,'今日文章服务暂不可用，已为你准备完整的主题文章。');
+   const signature=await digest(JSON.stringify(prepared.targets)),cache=globalThis.caches?.default;
+   const cacheKey=new Request(url.origin+'/api/reading-cache/'+READING_GENERATOR_VERSION+'/'+signature);
+   const cached=await cache?.match(cacheKey);if(cached)return json(await cached.json());
+   // A hard site-wide ceiling bounds use of the existing free AI allocation.
+   // No paid plan, API key, or automatic retry is created by this feature.
+   try{await limit(env.DB,'reading-ip:'+await digest(ip),8,86400);await limit(env.DB,'reading-global-v2',READING_DAILY_LIMIT,86400);}
+   catch(error){if(error.status===429)throw new HttpError(429,'今日文章生成额度已用完，可先阅读完整主题文章，明天再生成。');throw error;}
+   let article;try{article=await generateReading(env.AI,prepared);}catch(error){console.error('Reading generation failed:',error.message);throw new HttpError(503,'今日文章生成暂未完成，已为你准备完整的主题文章，可稍后重试。');}
+   if(cache){const stored=new Response(JSON.stringify({article}),{headers:{'Content-Type':'application/json','Cache-Control':'public, max-age=604800'}});const pending=cache.put(cacheKey,stored);if(ctx?.waitUntil)ctx.waitUntil(pending);else await pending;}
+   return json({article});
+  }
   if(['/api/register','/api/login','/api/recover'].includes(path)&&request.method==='POST'){
    await limit(env.DB,'auth-ip:'+await digest(ip),40,900);
    const b=await body(request),username=credentials(b);

@@ -33,7 +33,7 @@ test('all IELTS legacy learning senses retain usable retry examples and typed me
 });
 
 test('the full IELTS lexicon can supply daily reading contexts, including inflected verbs',()=>{
- const article=createArticle(ids);assert.equal(article.covered,3655);assert.deepEqual(article.missing,[]);
- assert.equal(article.paragraphs.length,3655);
- for(const p of article.paragraphs)assert.ok(wordMap[p.wordId].senses.some(s=>s.id===p.senseId));
+ const article=createArticle(ids);assert.equal(article.total,3655);assert.equal(article.covered+article.missing.length,3655);
+ assert.ok(article.paragraphs.length>=5&&article.paragraphs.length<=14);assert.ok(article.wordCount>=350);
+ for(const g of article.glossary)assert.ok(wordMap[g.wordId].senses.some(s=>s.id===g.senseId));
 });
