@@ -1,7 +1,7 @@
 import {readingTargets,assembleArticle} from '../dist/reading-model.js';
 
 export const READING_MODEL='@cf/qwen/qwen3-30b-a3b-fp8';
-export const READING_GENERATOR_VERSION='story-v5';
+export const READING_GENERATOR_VERSION='story-v6';
 export const READING_DAILY_LIMIT=20;
 export function readingPrompt(targets){
  const chosen=targets.slice(0,80),paragraphs=chosen.length<=12?6:chosen.length<=30?8:chosen.length<=50?11:14;
@@ -21,6 +21,9 @@ export async function generateReading(ai,prepared){
  const result=await ai.run(READING_MODEL,{messages,max_tokens:7000,temperature:.6,repetition_penalty:1.08,response_format:{type:'json_object'}});
  let raw=result?.choices?.[0]?.message?.content??result?.response??result;
  if(typeof raw==='string')raw=JSON.parse(raw.replace(/^\s*<think>[\s\S]*?<\/think>\s*/,'').replace(/^```(?:json)?\s*|\s*```$/g,''));
+ // Lodging is uncountable in the IELTS sense. Preserve valid phrases such as
+ // "a type of accommodation"; only remove an article immediately before a known adjective+noun phrase.
+ if(Array.isArray(raw?.paragraphs))raw={...raw,paragraphs:raw.paragraphs.map(p=>({...p,en:typeof p?.en==='string'?p.en.replace(/\b(?:a|an)\s+((?:(?:good|comfortable|suitable|affordable|cheap|temporary|permanent|furnished|residential|excellent|new|ideal)\s+)*accommodation)\b/gi,(match,phrase)=>/^[A-Z]/.test(match)?phrase[0].toUpperCase()+phrase.slice(1):phrase):p?.en}))};
  const article=assembleArticle(raw,prepared.targets);
  if(article.wordCount<300||article.paragraphs.length<5||article.paragraphs.some(p=>(p.en.match(/[.!?](?:\s|$)/g)||[]).length<3))throw Error('文章尚未形成足够完整的段落。');
  // Reject an otherwise fluent article that ignored the day's vocabulary.

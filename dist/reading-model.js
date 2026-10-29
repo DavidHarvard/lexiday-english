@@ -34,7 +34,7 @@ export function readingTargets(ids,learnedSenseIds=[]){
   return {wordId,senseId:sense.id,pos:entry.pos,meaning:entry.meaning};
  });
 }
-export function assembleArticle(raw,targets,{mode='generated',sourceId='daily',dictionaryGloss=false}={}){
+export function assembleArticle(raw,targets,{mode='generated',sourceId='daily',dictionaryGloss=true}={}){
  if(!raw||typeof raw.title!=='string'||!raw.title.trim()||raw.title.length>160||typeof raw.subtitle!=='string'||raw.subtitle.length>240||!Array.isArray(raw.paragraphs)||raw.paragraphs.length<4||raw.paragraphs.length>24)throw Error('文章结构不完整。');
  const paragraphs=raw.paragraphs.map(p=>{
   if(!p||typeof p.en!=='string'||typeof p.zh!=='string'||countWords(p.en)<25||p.en.length>5000||p.zh.length>5000||!/[\u3400-\u9fff]/.test(p.zh)||/[<>]/.test(p.en+p.zh))throw Error('文章段落或翻译不完整。');
@@ -54,7 +54,7 @@ export function assembleArticle(raw,targets,{mode='generated',sourceId='daily',d
 export function validateReadingArticle(article){
  if(!article||article.version!==READING_VERSION||!['generated','library'].includes(article.mode)||typeof article.sourceId!=='string'||article.sourceId.length>100)throw Error('阅读版本无效。');
  const targets=readingTargets(article.targetWordIds,article.glossary?.map(g=>g.senseId)||[]);
- const rebuilt=assembleArticle(article,targets,{mode:article.mode,sourceId:article.sourceId,dictionaryGloss:article.mode==='library'});
- if(article.covered!==rebuilt.covered||article.total!==rebuilt.total||article.wordCount!==rebuilt.wordCount||!Array.isArray(article.missing)||JSON.stringify(article.missing)!==JSON.stringify(rebuilt.missing)||!Array.isArray(article.glossary)||article.glossary.length!==rebuilt.glossary.length||article.glossary.some((g,i)=>['wordId','senseId','paragraphIndex','form','en','zh','pos','meaning','dictionaryGloss'].some(key=>g[key]!==rebuilt.glossary[i][key])))throw Error('阅读词卡与正文不一致。');
+ const rebuilt=assembleArticle(article,targets,{mode:article.mode,sourceId:article.sourceId});
+ if(article.covered!==rebuilt.covered||article.total!==rebuilt.total||article.wordCount!==rebuilt.wordCount||!Array.isArray(article.missing)||JSON.stringify(article.missing)!==JSON.stringify(rebuilt.missing)||!Array.isArray(article.glossary)||article.glossary.length!==rebuilt.glossary.length||article.glossary.some((g,i)=>['wordId','senseId','paragraphIndex','form','en','zh','pos','meaning'].some(key=>g[key]!==rebuilt.glossary[i][key])))throw Error('阅读词卡与正文不一致。');
  return rebuilt;
 }

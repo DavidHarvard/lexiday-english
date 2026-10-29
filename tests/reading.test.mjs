@@ -48,6 +48,12 @@ test('generation prompt uses known vocabulary and enforces a complete story and 
  assert.throws(()=>prepareReadingRequest({ids:['__proto__'],senseIds:[]}));assert.throws(()=>prepareReadingRequest({ids:Array(501).fill('light'),senseIds:[]}));
  await assert.rejects(()=>generateReading({run:async()=>({response:'not JSON'})},input));
 });
+test('generated word cards do not claim that a learned sense is the only meaning of a new context',async()=>{
+ const source=structuredClone(readingLibrary[0]);source.paragraphs[0].en+=' She hoped to find a comfortable accommodation, a type of accommodation that suited her needs.';
+ const article=await generateReading({run:async()=>({response:source})},prepareReadingRequest({ids:['accommodation'],senseIds:[]}));
+ assert.ok(article.glossary.every(g=>g.dictionaryGloss));assert.doesNotMatch(article.paragraphs[0].en,/a comfortable accommodation/);assert.match(article.paragraphs[0].en,/a type of accommodation/);
+ article.glossary[0].dictionaryGloss=false;assert.equal(validateReadingArticle(article).glossary[0].dictionaryGloss,true);
+});
 test('reading API supports guests, checks origin and vocabulary, and caps generation without changing accounts',async()=>{
  const env={DB:database(),AUTH_PEPPER:'test-only-pepper-not-for-production-12345',AI:{run:async()=>({response:readingLibrary[0]})}};
  let caller=0;const call=(ids=['furnished'],origin='https://example.test')=>worker.fetch(new Request('https://example.test/api/reading',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','CF-Connecting-IP':'reading-test-'+caller++},body:JSON.stringify({ids,senseIds:[]})}),env,{});
