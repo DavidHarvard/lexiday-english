@@ -27,14 +27,14 @@ export async function mountListening(host,notes,save){
     <div class="listening-player-actions"><button type="button" id="listening-rewind">后退 5 秒</button><button type="button" class="primary" id="listening-transcript-button" aria-expanded="false" aria-controls="listening-transcript">显示英文原文</button></div>
     <p class="fine"><a href="${track.audio}" download="${track.filename}">下载音频</a></p>
     <p class="fine" id="listening-audio-error" role="status"></p>`;
-   questions.innerHTML=`<h3>对应题目 · Questions ${(track.part-1)*10+1}–${track.part*10}</h3><p class="fine">填空题输入英文或数字；选择与配对题输入原题字母，多选题按提示填写。答案自动保存。</p>
+   questions.innerHTML=`<h3>对应题目 · Questions ${(track.part-1)*10+1}–${track.part*10}</h3><p class="fine">填空题输入英文或数字；选择与配对题输入原题字母。单题多选可填 D, F；跨两个题号的多选题每题填一个字母，不限顺序。答案自动保存。</p>
     <p class="fine listening-pan-hint">直接在原题空白处填写。题页可左右滑动；选择题在题号右侧填写字母。</p>
     <div class="listening-paper-scroll" tabindex="0" aria-label="完整原题与答题区，可左右滚动">${layouts[track.id].map((page,i)=>`<div class="listening-paper" style="aspect-ratio:${page.width}/${page.height}"><img src="${page.image}" alt="Test ${track.test} Section ${track.part} 完整原题，第 ${i+1} 页" loading="lazy">${page.fields.map(f=>{
      const full=notes[key('answer-'+f.number)]||'',value=f.parts===1?full:full.split(' / ')[f.part]||'';
      return `<input id="listening-answer-${f.number}${f.part?'-'+f.part:''}" class="listening-paper-input" data-listening-answer="${f.number}" data-answer-part="${f.part}" data-answer-parts="${f.parts}" autocomplete="off" maxlength="300" value="${escape(value)}" aria-label="第 ${f.number} 题答案${f.parts>1?'，第 '+(f.part+1)+' 空':''}" aria-describedby="listening-feedback-${f.number}" title="第 ${f.number} 题" style="left:${f.x/page.width*100}%;top:${f.y/page.height*100}%;width:${f.width/page.width*100}%;height:${f.height/page.height*100}%">`;
     }).join('')}</div>`).join('')}</div>
     <div class="listening-results">${track.questions.map(q=>`<p id="listening-feedback-${q.number}" class="listening-feedback" hidden></p>`).join('')}</div>
-    ${LISTENING_ANSWERS[track.id]?'<button type="button" id="listening-check" class="primary">检验答案</button><p id="listening-score" role="status" aria-live="polite"></p>':'<p class="fine">此段暂未提供标准答案，可填写保存，暂不自动判分。</p>'}`;
+    ${LISTENING_ANSWERS[track.id]?`<button type="button" id="listening-check" class="primary">检验答案</button><p id="listening-score" role="status" aria-live="polite"></p><p class="fine">按当前 Section 的 10 个题号计分；单题双空或多选需全部答对。<a href="${escape(LISTENING_ANSWERS[track.id].source)}" target="_blank" rel="noopener noreferrer">答案来源：IELTS EXTREMES · Test ${track.test}</a></p>`:'<p class="fine">此段暂未提供标准答案，可填写保存，暂不自动判分。</p>'}`;
    const audio=host.querySelector('audio');
    const remember=()=>{if(revision!==generation)return;saveListeningPosition(notes,track,audio.currentTime);save();};
    audio.addEventListener('loadedmetadata',()=>{if(position>0&&position<audio.duration)audio.currentTime=position;});

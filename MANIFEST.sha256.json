@@ -3,7 +3,7 @@
   ".gitignore": "6ac33c0735596412098f8d67d73fa6fcc6608ccfad670585aa0f541001f36f16",
   "ACCOUNT_DEPLOYMENT.md": "1364e1e7e0dfc3af6a25f4f53b42e04305ddbdb33c93313294e2633285d52453",
   "CLOUDFLARE_DEPLOYMENT.md": "9eb6e1dc804d18ecf25ddecb483cb6f638ff7fcb28722a93bc2fdfa3d3cdd79f",
-  "README.md": "9e87d4dcdbc84230823bebf7e4a6897c72908ee4d6c19ba332618c314432d623",
+  "README.md": "8896a64dc899b6829b362f9b9131ac3243a64b0046aab721a75283e08e3bc08a",
   "REVIEW_AND_VOCABULARY.md": "6b0fdd610804d7196b6a49bc694ec4007b78a710b14959ebf4fc07e0ddab25e4",
   "UNIT1_TEST_ENVIRONMENT.md": "8eedffff169d90630b690324b57cc08b1ee93e39d843e7c1ff7b9131690c855b",
   "data/english-definitions.txt": "4781bd57dc0adf2c8f4054701b54ef1e1937335fafc5942b4ada0553f50f1d5e",
@@ -137,9 +137,15 @@
   "dist/listening/cambridge-04/test-4-section-4-sharks-in-australia.mp3": "d43bf240b2414f22329ae2890dca50ad81175423290b14db0ec2819535aa83b4",
   "dist/listening/cambridge-04/test-4-section-4-sharks-in-australia.txt": "6ed85917b24c13cb82e5fa04fe992666c45bc588e10c6a1378852acac2016f1f",
   "scripts/import-listening.py": "ab6965c8dd132ff41daab16d1ede217d68d937f739c9965f53215b445208c97c",
-  "tests/listening.test.mjs": "16de18964b15c3a6b266f867834c9ee88743d3bbb5534fa51d72d2f716fb87e9",
-  "dist/listening-model.js": "8f128671a0a91ca60edd36d5d97382d22b7aae51357c4af45a7802d12accc85a",
-  "dist/listening-ui.js": "7a47c72a7dbaa2e55dc7cd1f3aa4a68d888825e6343115418073cbaee2b28c46",
+  "tests/listening.test.mjs": "9636ebceacb5b361142b16d76b35ccd72bf7d74ef834bb990495c3579977cbeb",
+  "dist/listening-model.js": "fe6ce01af8a9510fdf5bfb921a14cdc3add5e90ec34fb7ee59a1b291bcd30cfc",
+  "dist/listening-ui.js": "bb8b9a639762dcdd03ba1243e53918c7c5a9676dda95b966efc447ff64e6f80a",
   "dist/listening/cambridge-04/question-layouts.json": "cbc50654aca64e0cacef3c019775614af32b810328664d521de6d8b2de50aa5e",
-  "scripts/build-listening-layouts.py": "396d4ec02a65b4bb8f968c18b70e51990633227d43b96dde2bd68b7e207e5d2b"
+  "scripts/build-listening-layouts.py": "396d4ec02a65b4bb8f968c18b70e51990633227d43b96dde2bd68b7e207e5d2b",
+  "listening-model.js": "fe6ce01af8a9510fdf5bfb921a14cdc3add5e90ec34fb7ee59a1b291bcd30cfc",
+  "listening-ui.js": "bb8b9a639762dcdd03ba1243e53918c7c5a9676dda95b966efc447ff64e6f80a",
+  "data/imports/cambridge-4-listening-answers.json": "ad209e0d240a9bbb3092212e33a20ef0d3b3c821158e0ca7f0ed5e6b53e9d2a3",
+  "dist/listening-answers.js": "c076dd336a882930bc78a206bfc34d3b79bd709a6797022de769da973e34af90",
+  "listening-answers.js": "c076dd336a882930bc78a206bfc34d3b79bd709a6797022de769da973e34af90",
+  "scripts/build-listening-answers.mjs": "ac3971a6dd8acc7b3912ad78401eb58c98f0f256faa046f25ab188010c6aeeed"
 }
