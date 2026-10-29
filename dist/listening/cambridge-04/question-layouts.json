@@ -1,0 +1,1750 @@
+{
+  "test-1-section-1-social-programme-trips": [
+    {
+      "image": "/listening/cambridge-04/question-page-1.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 1,
+          "x": 244.95,
+          "y": 510.75,
+          "width": 125.9,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 2,
+          "x": 213.42,
+          "y": 534.93,
+          "width": 160.99,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 3,
+          "x": 409.66,
+          "y": 612.69,
+          "width": 48.99,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 4,
+          "x": 301.99,
+          "y": 685.29,
+          "width": 76.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-2.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 5,
+          "x": 184.62,
+          "y": 331.47,
+          "width": 98.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 6,
+          "x": 426.46,
+          "y": 360.21,
+          "width": 98.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 7,
+          "x": 63.72,
+          "y": 388.95,
+          "width": 98.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 8,
+          "x": 426.46,
+          "y": 447.09,
+          "width": 98.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 9,
+          "x": 116.58,
+          "y": 493.59,
+          "width": 84.02,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 10,
+          "x": 379.44,
+          "y": 493.59,
+          "width": 77.06,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-1-section-2-riverside-industrial-village": [
+    {
+      "image": "/listening/cambridge-04/question-page-3.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 11,
+          "x": 237.98,
+          "y": 303.33,
+          "width": 98.06,
+          "height": 20,
+          "part": 0,
+          "parts": 2
+        },
+        {
+          "number": 11,
+          "x": 356.24,
+          "y": 303.33,
+          "width": 125.96,
+          "height": 20,
+          "part": 1,
+          "parts": 2
+        },
+        {
+          "number": 12,
+          "x": 420.77,
+          "y": 327.51,
+          "width": 90.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 13,
+          "x": 197.9,
+          "y": 375.81,
+          "width": 84.02,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-4.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 14,
+          "x": 286.74,
+          "y": 701.61,
+          "width": 41.97,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 15,
+          "x": 393.18,
+          "y": 647.43,
+          "width": 55.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 16,
+          "x": 213.18,
+          "y": 647.43,
+          "width": 55.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 17,
+          "x": 366.18,
+          "y": 155.67,
+          "width": 55.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 18,
+          "x": 445.74,
+          "y": 250.23,
+          "width": 41.97,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 19,
+          "x": 178,
+          "y": 334,
+          "width": 38,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 20,
+          "x": 187.14,
+          "y": 425.01,
+          "width": 41.97,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-1-section-3-assignment-extension": [
+    {
+      "image": "/listening/cambridge-04/question-page-5.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 21,
+          "x": 548,
+          "y": 386.13,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 22,
+          "x": 548,
+          "y": 482.73,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-6.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 23,
+          "x": 287.61,
+          "y": 362.02,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 24,
+          "x": 287.62,
+          "y": 386.13,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 25,
+          "x": 287.57,
+          "y": 410.32,
+          "width": 119.05,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 26,
+          "x": 287.62,
+          "y": 434.43,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 27,
+          "x": 287.66,
+          "y": 458.55,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-7.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 28,
+          "x": 191.22,
+          "y": 175.71,
+          "width": 35.01,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 29,
+          "x": 334.74,
+          "y": 207.09,
+          "width": 35.01,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 30,
+          "x": 491.76,
+          "y": 146.49,
+          "width": 35.01,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-1-section-4-urban-landscape": [
+    {
+      "image": "/listening/cambridge-04/question-page-8.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 31,
+          "x": 223.43,
+          "y": 283.89,
+          "width": 97.94,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 32,
+          "x": 290.59,
+          "y": 332.19,
+          "width": 98.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 33,
+          "x": 289.38,
+          "y": 364.41,
+          "width": 98.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 34,
+          "x": 146.41,
+          "y": 428.79,
+          "width": 104.91,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 35,
+          "x": 138.65,
+          "y": 493.17,
+          "width": 125.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 36,
+          "x": 299.15,
+          "y": 573.7,
+          "width": 125.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 37,
+          "x": 290.22,
+          "y": 622.0,
+          "width": 133.03,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 38,
+          "x": 133.63,
+          "y": 638.07,
+          "width": 125.9,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 39,
+          "x": 101.41,
+          "y": 702.45,
+          "width": 118.94,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 40,
+          "x": 328.01,
+          "y": 750.99,
+          "width": 97.94,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-2-section-1-city-sightseeing": [
+    {
+      "image": "/listening/cambridge-04/question-page-33.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 1,
+          "x": 548,
+          "y": 492.76,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 2,
+          "x": 548,
+          "y": 617.56,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-34.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 3,
+          "x": 548,
+          "y": 79.54,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 4,
+          "x": 548,
+          "y": 204.35,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 5,
+          "x": 548,
+          "y": 329.15,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-35.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 6,
+          "x": 230.62,
+          "y": 79.89,
+          "width": 174.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 7,
+          "x": 294.79,
+          "y": 111.21,
+          "width": 140.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 8,
+          "x": 283.8,
+          "y": 142.28,
+          "width": 139.94,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 9,
+          "x": 329.04,
+          "y": 329.49,
+          "width": 153.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 10,
+          "x": 287.67,
+          "y": 360.7,
+          "width": 195.97,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-2-section-2-student-counselling": [
+    {
+      "image": "/listening/cambridge-04/question-page-36.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 11,
+          "x": 548,
+          "y": 173.14,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 12,
+          "x": 548,
+          "y": 297.95,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 13,
+          "x": 548,
+          "y": 422.75,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 14,
+          "x": 548,
+          "y": 547.55,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 15,
+          "x": 548,
+          "y": 672.35,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-37.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 16,
+          "x": 548,
+          "y": 110.75,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 17,
+          "x": 548,
+          "y": 235.55,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 18,
+          "x": 548,
+          "y": 360.35,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 19,
+          "x": 548,
+          "y": 485.15,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 20,
+          "x": 548,
+          "y": 609.95,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-2-section-3-research-assignment": [
+    {
+      "image": "/listening/cambridge-04/question-page-38.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 21,
+          "x": 371.51,
+          "y": 333.21,
+          "width": 111.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 22,
+          "x": 244.5,
+          "y": 395.62,
+          "width": 69.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 23,
+          "x": 280.2,
+          "y": 489.21,
+          "width": 70.04,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 24,
+          "x": 244.49,
+          "y": 551.62,
+          "width": 69.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-39.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 25,
+          "x": 320,
+          "y": 280,
+          "width": 44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 26,
+          "x": 380,
+          "y": 280,
+          "width": 44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 27,
+          "x": 77.16,
+          "y": 531.11,
+          "width": 67.44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 28,
+          "x": 171.66,
+          "y": 593.98,
+          "width": 97.44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 29,
+          "x": 329.16,
+          "y": 593.98,
+          "width": 67.44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 30,
+          "x": 428.94,
+          "y": 656.87,
+          "width": 89.94,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-2-section-4-corporate-crime": [
+    {
+      "image": "/listening/cambridge-04/question-page-40.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 31,
+          "x": 548,
+          "y": 173.14,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 32,
+          "x": 548,
+          "y": 297.95,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-41.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 33,
+          "x": 149.53,
+          "y": 236.38,
+          "width": 153.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 34,
+          "x": 128.96,
+          "y": 267.58,
+          "width": 230.89,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 35,
+          "x": 316.71,
+          "y": 361.19,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 36,
+          "x": 205.97,
+          "y": 423.6,
+          "width": 160.99,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 37,
+          "x": 293.23,
+          "y": 548.41,
+          "width": 111.92,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 38,
+          "x": 226.43,
+          "y": 579.61,
+          "width": 132.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-42.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 39,
+          "x": 320,
+          "y": 355,
+          "width": 44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 40,
+          "x": 380,
+          "y": 355,
+          "width": 44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-3-section-1-accommodation-request": [
+    {
+      "image": "/listening/cambridge-04/question-page-64.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 1,
+          "x": 323.34,
+          "y": 485.62,
+          "width": 142.5,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 2,
+          "x": 352.56,
+          "y": 548.02,
+          "width": 112.44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 3,
+          "x": 322.32,
+          "y": 610.42,
+          "width": 112.5,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 4,
+          "x": 325.02,
+          "y": 641.62,
+          "width": 112.5,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-65.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 5,
+          "x": 548,
+          "y": 142.29,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 6,
+          "x": 548,
+          "y": 267.11,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 7,
+          "x": 548,
+          "y": 391.92,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 8,
+          "x": 100.96,
+          "y": 672.69,
+          "width": 133.03,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 9,
+          "x": 350.9,
+          "y": 703.9,
+          "width": 105.07,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 10,
+          "x": 256.09,
+          "y": 735.1,
+          "width": 132.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-3-section-2-arts-festival": [
+    {
+      "image": "/listening/cambridge-04/question-page-66.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 11,
+          "x": 548,
+          "y": 173.49,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 12,
+          "x": 548,
+          "y": 298.31,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 13,
+          "x": 548,
+          "y": 423.12,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 14,
+          "x": 548,
+          "y": 547.93,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-67.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 15,
+          "x": 369.86,
+          "y": 299.32,
+          "width": 62.99,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 16,
+          "x": 469.42,
+          "y": 268.11,
+          "width": 69.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 17,
+          "x": 153.0,
+          "y": 330.99,
+          "width": 76.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 18,
+          "x": 469.44,
+          "y": 330.99,
+          "width": 69.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 19,
+          "x": 153.01,
+          "y": 400.05,
+          "width": 76.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 20,
+          "x": 469.46,
+          "y": 400.05,
+          "width": 69.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-3-section-3-study-skills": [
+    {
+      "image": "/listening/cambridge-04/question-page-68.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 21,
+          "x": 548,
+          "y": 173.49,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 22,
+          "x": 548,
+          "y": 298.31,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 23,
+          "x": 548,
+          "y": 423.12,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 24,
+          "x": 548,
+          "y": 547.93,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 25,
+          "x": 548,
+          "y": 672.75,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-69.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 26,
+          "x": 548,
+          "y": 235.89,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 27,
+          "x": 548,
+          "y": 360.7,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 28,
+          "x": 548,
+          "y": 485.52,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 29,
+          "x": 548,
+          "y": 610.33,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 30,
+          "x": 548,
+          "y": 735.14,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-70.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": []
+    }
+  ],
+  "test-3-section-4-student-union-building": [
+    {
+      "image": "/listening/cambridge-04/question-page-71.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 31,
+          "x": 340.66,
+          "y": 365.23,
+          "width": 111.92,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 32,
+          "x": 176.22,
+          "y": 396.43,
+          "width": 135.91,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-72.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 33,
+          "x": 203.62,
+          "y": 206.2,
+          "width": 76.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 34,
+          "x": 423.6,
+          "y": 174.99,
+          "width": 83.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 35,
+          "x": 204.0,
+          "y": 269.07,
+          "width": 83.99,
+          "height": 20,
+          "part": 0,
+          "parts": 2
+        },
+        {
+          "number": 35,
+          "x": 212.34,
+          "y": 300.27,
+          "width": 77.06,
+          "height": 20,
+          "part": 1,
+          "parts": 2
+        },
+        {
+          "number": 36,
+          "x": 321.0,
+          "y": 269.07,
+          "width": 77.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 37,
+          "x": 471.22,
+          "y": 300.27,
+          "width": 49.01,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 38,
+          "x": 330,
+          "y": 425,
+          "width": 110,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-73.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 39,
+          "x": 465,
+          "y": 80,
+          "width": 80,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 40,
+          "x": 330,
+          "y": 330,
+          "width": 110,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-4-section-1-johns-goodbye-party": [
+    {
+      "image": "/listening/cambridge-04/question-page-98.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 1,
+          "x": 126.41,
+          "y": 485.97,
+          "width": 119.03,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 2,
+          "x": 348.54,
+          "y": 610.78,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 3,
+          "x": 365.91,
+          "y": 673.18,
+          "width": 105.02,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 4,
+          "x": 327.87,
+          "y": 704.39,
+          "width": 139.97,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-99.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 5,
+          "x": 324.79,
+          "y": 80.37,
+          "width": 132.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 6,
+          "x": 333.73,
+          "y": 111.58,
+          "width": 140.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 7,
+          "x": 327.83,
+          "y": 173.98,
+          "width": 154.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 8,
+          "x": 327.82,
+          "y": 267.59,
+          "width": 160.99,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 9,
+          "x": 327.81,
+          "y": 298.8,
+          "width": 160.99,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 10,
+          "x": 330.14,
+          "y": 330.0,
+          "width": 160.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-4-section-2-walking-holidays": [
+    {
+      "image": "/listening/cambridge-04/question-page-100.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 11,
+          "x": 548,
+          "y": 173.49,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 12,
+          "x": 548,
+          "y": 298.31,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 13,
+          "x": 548,
+          "y": 423.12,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 14,
+          "x": 548,
+          "y": 547.93,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 15,
+          "x": 548,
+          "y": 672.75,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-101.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 16,
+          "x": 215.46,
+          "y": 392.91,
+          "width": 90.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 17,
+          "x": 383.52,
+          "y": 424.11,
+          "width": 125.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 18,
+          "x": 437.1,
+          "y": 487.0,
+          "width": 76.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 19,
+          "x": 215.46,
+          "y": 549.87,
+          "width": 90.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 20,
+          "x": 408.37,
+          "y": 581.08,
+          "width": 105.02,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-4-section-3-science-experiments": [
+    {
+      "image": "/listening/cambridge-04/question-page-102.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 21,
+          "x": 232.9,
+          "y": 299.31,
+          "width": 90.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 22,
+          "x": 432.54,
+          "y": 393.39,
+          "width": 69.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 23,
+          "x": 232.9,
+          "y": 425.07,
+          "width": 90.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 24,
+          "x": 381.63,
+          "y": 456.28,
+          "width": 83.98,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 25,
+          "x": 232.89,
+          "y": 550.42,
+          "width": 111.94,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 26,
+          "x": 381.66,
+          "y": 519.21,
+          "width": 97.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-103.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 27,
+          "x": 274.31,
+          "y": 548.92,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 28,
+          "x": 274.3,
+          "y": 580.12,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 29,
+          "x": 274.28,
+          "y": 611.32,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 30,
+          "x": 274.25,
+          "y": 673.73,
+          "width": 119.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ],
+  "test-4-section-4-sharks-in-australia": [
+    {
+      "image": "/listening/cambridge-04/question-page-104.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 31,
+          "x": 371.62,
+          "y": 376.3,
+          "width": 91.04,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 32,
+          "x": 292.48,
+          "y": 469.91,
+          "width": 83.96,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 33,
+          "x": 386.78,
+          "y": 501.11,
+          "width": 77.0,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 34,
+          "x": 435.05,
+          "y": 532.32,
+          "width": 76.95,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-105.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 35,
+          "x": 548,
+          "y": 142.29,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 36,
+          "x": 548,
+          "y": 267.11,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 37,
+          "x": 548,
+          "y": 391.92,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 38,
+          "x": 548,
+          "y": 516.73,
+          "width": 35,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    },
+    {
+      "image": "/listening/cambridge-04/question-page-106.webp",
+      "width": 595.32,
+      "height": 841.92,
+      "fields": [
+        {
+          "number": 39,
+          "x": 320,
+          "y": 455,
+          "width": 44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        },
+        {
+          "number": 40,
+          "x": 380,
+          "y": 455,
+          "width": 44,
+          "height": 20,
+          "part": 0,
+          "parts": 1
+        }
+      ]
+    }
+  ]
+}

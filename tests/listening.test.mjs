@@ -5,6 +5,20 @@ import {createHash} from 'node:crypto';
 import {listeningKey,saveListeningPosition,checkListeningAnswers,FIRST_LISTENING_ID,saveListeningNote} from '../dist/listening-model.js';
 import {initialIelts,validateIelts} from '../dist/ielts-model.js';
 const tracks=JSON.parse(readFileSync(new URL('../dist/listening/cambridge-04/catalog.json',import.meta.url)));
+const layouts=JSON.parse(readFileSync(new URL('../dist/listening/cambridge-04/question-layouts.json',import.meta.url)));
+test('original question pages have inputs for all 160 questions without replacing any page image',()=>{
+ for(const track of tracks){
+  const pages=layouts[track.id];assert.deepEqual(pages.map(p=>p.image),track.pages);
+  const fields=pages.flatMap(p=>p.fields);
+  assert.deepEqual([...new Set(fields.map(f=>f.number))].sort((a,b)=>a-b),track.questions.map(q=>q.number));
+  for(const page of pages)for(const f of page.fields){assert.ok(f.x>=0&&f.y>=0&&f.width>0&&f.height>0);assert.ok(f.x+f.width<=page.width&&f.y+f.height<=page.height);}
+ }
+});
+test('two-blank questions keep two separate fields with stable fragment ordering',()=>{
+ for(const [id,q] of [[tracks[1].id,11],[tracks[11].id,35]]){
+  const fields=layouts[id].flatMap(p=>p.fields).filter(f=>f.number===q);assert.equal(fields.length,2);assert.deepEqual(fields.map(f=>f.part),[0,1]);assert.ok(fields.every(f=>f.parts===2));
+ }
+});
 test('16 uniquely named audio files match their original hashes and have substantial transcripts',()=>{
  assert.equal(tracks.length,16);assert.equal(new Set(tracks.map(t=>t.filename)).size,16);
  for(const track of tracks){

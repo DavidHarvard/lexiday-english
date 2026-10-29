@@ -38,7 +38,7 @@ function fullPlan() {
 }
 function listening() {
  queueMicrotask(()=>mountListening(document.getElementById('listening-workspace'),state.notes,save));
- return top('听清楚，再核对。','Cambridge IELTS 4 · 在线音频 · 答案与备注自动关联材料')+`<div class="i-grid"><section class="panel"><div class="section-heading"><h2>精听工作台</h2>${pill('16 段在线材料')}</div><div id="listening-workspace" aria-label="听力练习"><p class="muted">正在加载听力材料…</p></div></section><aside><section class="panel" id="listening-note-workspace" aria-label="音频备注"></section></aside></div>`;
+ return top('听清楚，再核对。','Cambridge IELTS 4 · 在线音频 · 答案与备注自动关联材料')+`<div class="listening-layout"><section class="panel listening-player-panel"><div class="section-heading"><h2>精听工作台</h2>${pill('16 段在线材料')}</div><div id="listening-workspace" aria-label="听力练习"><p class="muted">正在加载听力材料…</p></div></section><section class="panel" id="listening-note-workspace" aria-label="音频备注"></section><section class="panel listening-questions" id="listening-question-workspace" aria-label="听力原题"></section><section id="listening-transcript" class="panel listening-transcript listening-original-panel" aria-label="英文原文" hidden></section></div>`;
 }
 
 function writing() {
