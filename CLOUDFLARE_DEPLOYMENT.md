@@ -68,3 +68,8 @@ Cloudflare 控制台返回 Success / deployed。无 Cookie、无 Authorization �
 ## 连贯阅读与听力交互（2026-10-30）
 
 现有 Pages 项目加入 Workers AI binding，生成有统一主题和连贯段落的每日文章；提供四篇完整双语备用故事。听力题自动播放语音问题，作答后展示原文并重播。D1 表结构与账号密钥保持不变，继续使用既有进度同步。实现与验证见 [READING_AND_QUIZ.md](READING_AND_QUIZ.md)。
+
+
+## 完整 PDF 教材与首听笔记（2026-10-30）
+
+语法模块新增 294 页教材、115 单元及 35 组附加练习，489 题组共 3,373 项（2,970 自动检查、403 参考对照）。PDF 拆成 17 个分册按需载入，阅读页码和练习同步现有账号进度。Cambridge 听力答题框重新打开清空，首听笔记持久保存并自动显示。127 项规则测试、隔离数据库真实浏览器流程、阅读/语音调度回归通过。保留原 D1、AUTH_PEPPER 与 AI binding，不需要数据库迁移。详见 [GRAMMAR_READER.md](GRAMMAR_READER.md)。

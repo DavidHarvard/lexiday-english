@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,existsSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-import {listeningKey,saveListeningPosition,checkListeningAnswers,FIRST_LISTENING_ID,saveListeningNote,LISTENING_ANSWERS} from '../dist/listening-model.js';
+import {listeningKey,saveListeningPosition,checkListeningAnswers,FIRST_LISTENING_ID,saveListeningNote,LISTENING_ANSWERS,createListeningAttempts} from '../dist/listening-model.js';
 import {initialIelts,validateIelts} from '../dist/ielts-model.js';
 const tracks=JSON.parse(readFileSync(new URL('../dist/listening/cambridge-04/catalog.json',import.meta.url)));
 const layouts=JSON.parse(readFileSync(new URL('../dist/listening/cambridge-04/question-layouts.json',import.meta.url)));
@@ -38,7 +38,7 @@ test('audio resume position is saved without automatically recording practice me
  const notes={};saveListeningPosition(notes,tracks[0],130.4);
  assert.equal(notes[listeningKey(tracks[0].id,'position')],'130.4');assert.equal(notes['listen-source'],undefined);
 });
-test('dictation, answers and selection survive the existing IELTS backup and cloud validator independently',()=>{
+test('legacy dictation and answer backup keys remain readable without changing durable notes',()=>{
  const state=initialIelts('2026-10-24');
  state.notes[listeningKey(tracks[0].id,'dictation')]='First dictation';state.notes[listeningKey(tracks[1].id,'dictation')]='Second dictation';
  state.notes[listeningKey(tracks[0].id,'answer-1')]='shopping';state.notes['listening:selected']=tracks[0].id;
@@ -129,13 +129,28 @@ test('two-question multiple choice groups allow swaps but never count repeated l
  const answers=sectionAnswers(tracks[2]);[answers[2],answers[3]]=[answers[3],answers[2]];
  assert.equal(checkListeningAnswers(tracks[2].id,answers).correct,8);
 });
-test('answers for all sections survive backup and cloud validation with independent IDs',()=>{
+test('legacy answer history is retained in backups without becoming the current attempt',()=>{
  const state=initialIelts('2026-10-29');
  for(const track of tracks)track.questions.forEach((q,i)=>state.notes[listeningKey(track.id,'answer-'+q.number)]=sectionAnswers(track)[i]);
  const restored=validateIelts(JSON.parse(JSON.stringify(state)));
+ const attempt=createListeningAttempts();for(const track of tracks)assert.deepEqual(Object.keys(attempt.forTrack(restored.notes,track.id)),[]);
  const before=JSON.stringify(restored);
  for(const track of tracks){const answers=track.questions.map(q=>restored.notes[listeningKey(track.id,'answer-'+q.number)]);assert.equal(checkListeningAnswers(track.id,answers).correct,10);}
  assert.equal(JSON.stringify(restored),before);
+});
+test('current answers stay in memory across section changes but reset on reopening and never overwrite notes',()=>{
+ const owner={
+  [listeningKey(tracks[0].id,'answer-1')]:'an answer from an older version',
+  [listeningKey(tracks[0].id,'first-note')]:'My first listening note',
+  [listeningKey(tracks[0].id,'note-draft')]:'Unfinished note'
+ },before=JSON.stringify(owner),attempt=createListeningAttempts();
+ const first=attempt.forTrack(owner,tracks[0].id);assert.equal(first[1],undefined);first[1]='shopping';
+ const second=attempt.forTrack(owner,tracks[1].id);second[11]='coal / firewood';
+ assert.equal(attempt.forTrack(owner,tracks[0].id)[1],'shopping');assert.equal(attempt.forTrack(owner,tracks[1].id)[11],'coal / firewood');
+ assert.deepEqual(Object.keys(attempt.forTrack({...owner},tracks[0].id)),[],'a different account must get independent blanks');
+ assert.deepEqual(Object.keys(createListeningAttempts().forTrack(owner,tracks[0].id)),[],'a new page load must start blank');
+ attempt.reset();assert.deepEqual(Object.keys(attempt.forTrack(owner,tracks[0].id)),[],'bfcache restore must also start blank');
+ assert.equal(JSON.stringify(owner),before,'current answers must never mutate durable notes or legacy history');
 });
 test('first-listen note remains immutable, drafts clear after saving and notes stay scoped to audio across sync',()=>{
  const state=initialIelts('2026-10-27'),notes=state.notes,id=tracks[0].id,other=tracks[1].id;

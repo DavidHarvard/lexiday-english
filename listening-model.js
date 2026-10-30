@@ -1,6 +1,15 @@
 import {LISTENING_ANSWERS} from './listening-answers.js';
 export {LISTENING_ANSWERS};
 export function listeningKey(id, field) { return `listening:${id}:${field}`; }
+// Answers belong to the current page visit. Durable notes must never double as
+// answer drafts: a new page or a different account starts with empty fields.
+export function createListeningAttempts(){
+ let owners=new WeakMap();
+ return {
+  forTrack(notes,id){let tracks=owners.get(notes);if(!tracks){tracks=new Map();owners.set(notes,tracks);}if(!tracks.has(id))tracks.set(id,Object.create(null));return tracks.get(id);},
+  reset(){owners=new WeakMap();}
+ };
+}
 export function saveListeningPosition(notes,track,seconds) {
  notes[listeningKey(track.id,'position')]=String(Math.max(0,Number(seconds)||0));
 }

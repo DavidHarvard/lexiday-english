@@ -1,0 +1,829 @@
+{
+  "id": "essential-grammar-2015-294",
+  "title": "Essential Grammar in Use",
+  "pages": 294,
+  "partSize": 18,
+  "sourceSha256": "9357d089b01b2cd0527f2a258d556f4f7845a356d9afe8d0885213fe63f44f11",
+  "parts": [
+    {
+      "file": "part-01.pdf",
+      "start": 1,
+      "end": 18,
+      "bytes": 5773481
+    },
+    {
+      "file": "part-02.pdf",
+      "start": 19,
+      "end": 36,
+      "bytes": 6040049
+    },
+    {
+      "file": "part-03.pdf",
+      "start": 37,
+      "end": 54,
+      "bytes": 5664881
+    },
+    {
+      "file": "part-04.pdf",
+      "start": 55,
+      "end": 72,
+      "bytes": 6475950
+    },
+    {
+      "file": "part-05.pdf",
+      "start": 73,
+      "end": 90,
+      "bytes": 5533496
+    },
+    {
+      "file": "part-06.pdf",
+      "start": 91,
+      "end": 108,
+      "bytes": 5897060
+    },
+    {
+      "file": "part-07.pdf",
+      "start": 109,
+      "end": 126,
+      "bytes": 6454185
+    },
+    {
+      "file": "part-08.pdf",
+      "start": 127,
+      "end": 144,
+      "bytes": 6862768
+    },
+    {
+      "file": "part-09.pdf",
+      "start": 145,
+      "end": 162,
+      "bytes": 5609493
+    },
+    {
+      "file": "part-10.pdf",
+      "start": 163,
+      "end": 180,
+      "bytes": 5928087
+    },
+    {
+      "file": "part-11.pdf",
+      "start": 181,
+      "end": 198,
+      "bytes": 6076533
+    },
+    {
+      "file": "part-12.pdf",
+      "start": 199,
+      "end": 216,
+      "bytes": 5773341
+    },
+    {
+      "file": "part-13.pdf",
+      "start": 217,
+      "end": 234,
+      "bytes": 6500665
+    },
+    {
+      "file": "part-14.pdf",
+      "start": 235,
+      "end": 252,
+      "bytes": 6102369
+    },
+    {
+      "file": "part-15.pdf",
+      "start": 253,
+      "end": 270,
+      "bytes": 4690267
+    },
+    {
+      "file": "part-16.pdf",
+      "start": 271,
+      "end": 288,
+      "bytes": 2855518
+    },
+    {
+      "file": "part-17.pdf",
+      "start": 289,
+      "end": 294,
+      "bytes": 899082
+    }
+  ],
+  "units": [
+    {
+      "unit": 1,
+      "title": "am/is/are",
+      "page": 2,
+      "exercisePage": 3
+    },
+    {
+      "unit": 2,
+      "title": "am/is/are (questions)",
+      "page": 4,
+      "exercisePage": 5
+    },
+    {
+      "unit": 3,
+      "title": "I am doing (present continuous)",
+      "page": 6,
+      "exercisePage": 7
+    },
+    {
+      "unit": 4,
+      "title": "are you doing? (present continuous questions)",
+      "page": 8,
+      "exercisePage": 9
+    },
+    {
+      "unit": 5,
+      "title": "I do/work/like etc. (present simple)",
+      "page": 10,
+      "exercisePage": 11
+    },
+    {
+      "unit": 6,
+      "title": "I don’t … (present simple negative)",
+      "page": 12,
+      "exercisePage": 13
+    },
+    {
+      "unit": 7,
+      "title": "Do you … ? (present simple questions)",
+      "page": 14,
+      "exercisePage": 15
+    },
+    {
+      "unit": 8,
+      "title": "I am doing (present continuous) and I do (present simple)",
+      "page": 16,
+      "exercisePage": 17
+    },
+    {
+      "unit": 9,
+      "title": "I have … and I’ve got …",
+      "page": 18,
+      "exercisePage": 19
+    },
+    {
+      "unit": 10,
+      "title": "was/were",
+      "page": 20,
+      "exercisePage": 21
+    },
+    {
+      "unit": 11,
+      "title": "worked/got/went etc. (past simple)",
+      "page": 22,
+      "exercisePage": 23
+    },
+    {
+      "unit": 12,
+      "title": "I didn’t … Did you … ? (past simple negative and questions)",
+      "page": 24,
+      "exercisePage": 25
+    },
+    {
+      "unit": 13,
+      "title": "I was doing (past continuous)",
+      "page": 26,
+      "exercisePage": 27
+    },
+    {
+      "unit": 14,
+      "title": "I was doing (past continuous) and I did (past simple)",
+      "page": 28,
+      "exercisePage": 29
+    },
+    {
+      "unit": 15,
+      "title": "I have done (present perfect 1)",
+      "page": 30,
+      "exercisePage": 31
+    },
+    {
+      "unit": 16,
+      "title": "I’ve just … I’ve already … I haven’t … yet (present perfect 2)",
+      "page": 32,
+      "exercisePage": 33
+    },
+    {
+      "unit": 17,
+      "title": "Have you ever … ? (present perfect 3)",
+      "page": 34,
+      "exercisePage": 35
+    },
+    {
+      "unit": 18,
+      "title": "How long have you … ? (present perfect 4)",
+      "page": 36,
+      "exercisePage": 37
+    },
+    {
+      "unit": 19,
+      "title": "for since ago",
+      "page": 38,
+      "exercisePage": 39
+    },
+    {
+      "unit": 20,
+      "title": "I have done (present perfect) and I did (past)",
+      "page": 40,
+      "exercisePage": 41
+    },
+    {
+      "unit": 21,
+      "title": "is done was done (passive 1)",
+      "page": 42,
+      "exercisePage": 43
+    },
+    {
+      "unit": 22,
+      "title": "is being done has been done (passive 2)",
+      "page": 44,
+      "exercisePage": 45
+    },
+    {
+      "unit": 23,
+      "title": "be/have/do in present and past tenses",
+      "page": 46,
+      "exercisePage": 47
+    },
+    {
+      "unit": 24,
+      "title": "Regular and irregular verbs",
+      "page": 48,
+      "exercisePage": 49
+    },
+    {
+      "unit": 25,
+      "title": "What are you doing tomorrow?",
+      "page": 50,
+      "exercisePage": 51
+    },
+    {
+      "unit": 26,
+      "title": "I’m going to …",
+      "page": 52,
+      "exercisePage": 53
+    },
+    {
+      "unit": 27,
+      "title": "will/shall 1",
+      "page": 54,
+      "exercisePage": 55
+    },
+    {
+      "unit": 28,
+      "title": "will/shall 2",
+      "page": 56,
+      "exercisePage": 57
+    },
+    {
+      "unit": 29,
+      "title": "might",
+      "page": 58,
+      "exercisePage": 59
+    },
+    {
+      "unit": 30,
+      "title": "can and could",
+      "page": 60,
+      "exercisePage": 61
+    },
+    {
+      "unit": 31,
+      "title": "must mustn’t don’t need to",
+      "page": 62,
+      "exercisePage": 63
+    },
+    {
+      "unit": 32,
+      "title": "should",
+      "page": 64,
+      "exercisePage": 65
+    },
+    {
+      "unit": 33,
+      "title": "I have to …",
+      "page": 66,
+      "exercisePage": 67
+    },
+    {
+      "unit": 34,
+      "title": "Would you like … ? I’d like …",
+      "page": 68,
+      "exercisePage": 69
+    },
+    {
+      "unit": 35,
+      "title": "Do this! Don’t do that! Let’s do this!",
+      "page": 70,
+      "exercisePage": 71
+    },
+    {
+      "unit": 36,
+      "title": "I used to …",
+      "page": 72,
+      "exercisePage": 73
+    },
+    {
+      "unit": 37,
+      "title": "there is there are",
+      "page": 74,
+      "exercisePage": 75
+    },
+    {
+      "unit": 38,
+      "title": "there was/were there has/have been there will be",
+      "page": 76,
+      "exercisePage": 77
+    },
+    {
+      "unit": 39,
+      "title": "It …",
+      "page": 78,
+      "exercisePage": 79
+    },
+    {
+      "unit": 40,
+      "title": "I am, I don’t etc.",
+      "page": 80,
+      "exercisePage": 81
+    },
+    {
+      "unit": 41,
+      "title": "Have you? Are you? Don’t you? etc.",
+      "page": 82,
+      "exercisePage": 83
+    },
+    {
+      "unit": 42,
+      "title": "too/either so am I / neither do I etc.",
+      "page": 84,
+      "exercisePage": 85
+    },
+    {
+      "unit": 43,
+      "title": "isn’t, haven’t, don’t etc. (negatives)",
+      "page": 86,
+      "exercisePage": 87
+    },
+    {
+      "unit": 44,
+      "title": "is it … ? have you … ? do they … ? etc. (questions 1)",
+      "page": 88,
+      "exercisePage": 89
+    },
+    {
+      "unit": 45,
+      "title": "Who saw you? Who did you see? (questions 2)",
+      "page": 90,
+      "exercisePage": 91
+    },
+    {
+      "unit": 46,
+      "title": "Who is she talking to? What is it like? (questions 3)",
+      "page": 92,
+      "exercisePage": 93
+    },
+    {
+      "unit": 47,
+      "title": "What … ? Which … ? How … ? (questions 4)",
+      "page": 94,
+      "exercisePage": 95
+    },
+    {
+      "unit": 48,
+      "title": "How long does it take … ?",
+      "page": 96,
+      "exercisePage": 97
+    },
+    {
+      "unit": 49,
+      "title": "Do you know where … ? I don’t know what … etc",
+      "page": 98,
+      "exercisePage": 99
+    },
+    {
+      "unit": 50,
+      "title": "She said that … He told me that …",
+      "page": 100,
+      "exercisePage": 101
+    },
+    {
+      "unit": 51,
+      "title": "work/working go/going do/doing",
+      "page": 102,
+      "exercisePage": 103
+    },
+    {
+      "unit": 52,
+      "title": "to … (I want to do) and -ing (I enjoy doing)",
+      "page": 104,
+      "exercisePage": 105
+    },
+    {
+      "unit": 53,
+      "title": "I want you to … I told you to …",
+      "page": 106,
+      "exercisePage": 107
+    },
+    {
+      "unit": 54,
+      "title": "I went to the shop to …",
+      "page": 108,
+      "exercisePage": 109
+    },
+    {
+      "unit": 55,
+      "title": "go to … go on … go for … go -ing",
+      "page": 110,
+      "exercisePage": 111
+    },
+    {
+      "unit": 56,
+      "title": "get",
+      "page": 112,
+      "exercisePage": 113
+    },
+    {
+      "unit": 57,
+      "title": "do and make",
+      "page": 114,
+      "exercisePage": 115
+    },
+    {
+      "unit": 58,
+      "title": "have",
+      "page": 116,
+      "exercisePage": 117
+    },
+    {
+      "unit": 59,
+      "title": "I/me he/him they/them etc.",
+      "page": 118,
+      "exercisePage": 119
+    },
+    {
+      "unit": 60,
+      "title": "my/his/their etc.",
+      "page": 120,
+      "exercisePage": 121
+    },
+    {
+      "unit": 61,
+      "title": "Whose is this? It’s mine/yours/hers etc.",
+      "page": 122,
+      "exercisePage": 123
+    },
+    {
+      "unit": 62,
+      "title": "I/me/my/mine",
+      "page": 124,
+      "exercisePage": 125
+    },
+    {
+      "unit": 63,
+      "title": "myself/yourself/themselves etc.",
+      "page": 126,
+      "exercisePage": 127
+    },
+    {
+      "unit": 64,
+      "title": "-’s (Kate’s camera / my brother’s car etc.)",
+      "page": 128,
+      "exercisePage": 129
+    },
+    {
+      "unit": 65,
+      "title": "a/an …",
+      "page": 130,
+      "exercisePage": 131
+    },
+    {
+      "unit": 66,
+      "title": "train(s) bus(es) (singular and plural)",
+      "page": 132,
+      "exercisePage": 133
+    },
+    {
+      "unit": 67,
+      "title": "a bottle / some water (countable/uncountable 1)",
+      "page": 134,
+      "exercisePage": 135
+    },
+    {
+      "unit": 68,
+      "title": "a cake / some cake / some cakes (countable/uncountable 2)",
+      "page": 136,
+      "exercisePage": 137
+    },
+    {
+      "unit": 69,
+      "title": "a/an and the",
+      "page": 138,
+      "exercisePage": 139
+    },
+    {
+      "unit": 70,
+      "title": "the …",
+      "page": 140,
+      "exercisePage": 141
+    },
+    {
+      "unit": 71,
+      "title": "go to work go home go to the cinema",
+      "page": 142,
+      "exercisePage": 143
+    },
+    {
+      "unit": 72,
+      "title": "I like music I hate exams",
+      "page": 144,
+      "exercisePage": 145
+    },
+    {
+      "unit": 73,
+      "title": "the … (names of places)",
+      "page": 146,
+      "exercisePage": 147
+    },
+    {
+      "unit": 74,
+      "title": "this/that/these/those",
+      "page": 148,
+      "exercisePage": 149
+    },
+    {
+      "unit": 75,
+      "title": "one/ones",
+      "page": 150,
+      "exercisePage": 151
+    },
+    {
+      "unit": 76,
+      "title": "some and any",
+      "page": 152,
+      "exercisePage": 153
+    },
+    {
+      "unit": 77,
+      "title": "not + any no none",
+      "page": 154,
+      "exercisePage": 155
+    },
+    {
+      "unit": 78,
+      "title": "not + anybody/anyone/anything nobody/no-one/nothing",
+      "page": 156,
+      "exercisePage": 157
+    },
+    {
+      "unit": 79,
+      "title": "somebody/anything/nowhere etc.",
+      "page": 158,
+      "exercisePage": 159
+    },
+    {
+      "unit": 80,
+      "title": "every and all",
+      "page": 160,
+      "exercisePage": 161
+    },
+    {
+      "unit": 81,
+      "title": "all most some any no/none",
+      "page": 162,
+      "exercisePage": 163
+    },
+    {
+      "unit": 82,
+      "title": "both either neither",
+      "page": 164,
+      "exercisePage": 165
+    },
+    {
+      "unit": 83,
+      "title": "a lot much many",
+      "page": 166,
+      "exercisePage": 167
+    },
+    {
+      "unit": 84,
+      "title": "(a) little (a) few",
+      "page": 168,
+      "exercisePage": 169
+    },
+    {
+      "unit": 85,
+      "title": "old/nice/interesting etc. (adjectives)",
+      "page": 170,
+      "exercisePage": 171
+    },
+    {
+      "unit": 86,
+      "title": "quickly/badly/suddenly etc. (adverbs)",
+      "page": 172,
+      "exercisePage": 173
+    },
+    {
+      "unit": 87,
+      "title": "old/older expensive / more expensive",
+      "page": 174,
+      "exercisePage": 175
+    },
+    {
+      "unit": 88,
+      "title": "older than … more expensive than …",
+      "page": 176,
+      "exercisePage": 177
+    },
+    {
+      "unit": 89,
+      "title": "not as … as",
+      "page": 178,
+      "exercisePage": 179
+    },
+    {
+      "unit": 90,
+      "title": "the oldest the most expensive",
+      "page": 180,
+      "exercisePage": 181
+    },
+    {
+      "unit": 91,
+      "title": "enough",
+      "page": 182,
+      "exercisePage": 183
+    },
+    {
+      "unit": 92,
+      "title": "too",
+      "page": 184,
+      "exercisePage": 185
+    },
+    {
+      "unit": 93,
+      "title": "He speaks English very well. (word order 1)",
+      "page": 186,
+      "exercisePage": 187
+    },
+    {
+      "unit": 94,
+      "title": "always/usually/often etc. (word order 2)",
+      "page": 188,
+      "exercisePage": 189
+    },
+    {
+      "unit": 95,
+      "title": "still yet already",
+      "page": 190,
+      "exercisePage": 191
+    },
+    {
+      "unit": 96,
+      "title": "Give me that book! Give it to me!",
+      "page": 192,
+      "exercisePage": 193
+    },
+    {
+      "unit": 97,
+      "title": "and but or so because",
+      "page": 194,
+      "exercisePage": 195
+    },
+    {
+      "unit": 98,
+      "title": "When …",
+      "page": 196,
+      "exercisePage": 197
+    },
+    {
+      "unit": 99,
+      "title": "If we go … If you see … etc.",
+      "page": 198,
+      "exercisePage": 199
+    },
+    {
+      "unit": 100,
+      "title": "If I had … If we went … etc.",
+      "page": 200,
+      "exercisePage": 201
+    },
+    {
+      "unit": 101,
+      "title": "a person who … a thing that/which … (relative clauses 1)",
+      "page": 202,
+      "exercisePage": 203
+    },
+    {
+      "unit": 102,
+      "title": "the hotel you stayed at the people we met (relative clauses 2)",
+      "page": 204,
+      "exercisePage": 205
+    },
+    {
+      "unit": 103,
+      "title": "at 8 o’clock on Monday in April",
+      "page": 206,
+      "exercisePage": 207
+    },
+    {
+      "unit": 104,
+      "title": "from … to until since for",
+      "page": 208,
+      "exercisePage": 209
+    },
+    {
+      "unit": 105,
+      "title": "before after during while",
+      "page": 210,
+      "exercisePage": 211
+    },
+    {
+      "unit": 106,
+      "title": "in at on (places 1)",
+      "page": 212,
+      "exercisePage": 213
+    },
+    {
+      "unit": 107,
+      "title": "in at on (places 2)",
+      "page": 214,
+      "exercisePage": 215
+    },
+    {
+      "unit": 108,
+      "title": "to in at (places 3)",
+      "page": 216,
+      "exercisePage": 217
+    },
+    {
+      "unit": 109,
+      "title": "under, behind, opposite etc.",
+      "page": 218,
+      "exercisePage": 219
+    },
+    {
+      "unit": 110,
+      "title": "up, over, through etc.",
+      "page": 220,
+      "exercisePage": 221
+    },
+    {
+      "unit": 111,
+      "title": "on at by with about",
+      "page": 222,
+      "exercisePage": 223
+    },
+    {
+      "unit": 112,
+      "title": "afraid of …, good at … etc. of/at/for etc. (prepositions) + -ing",
+      "page": 224,
+      "exercisePage": 225
+    },
+    {
+      "unit": 113,
+      "title": "listen to …, look at … etc. (verb + preposition)",
+      "page": 226,
+      "exercisePage": 227
+    },
+    {
+      "unit": 114,
+      "title": "go in, fall off, run away etc. (phrasal verbs 1)",
+      "page": 228,
+      "exercisePage": 229
+    },
+    {
+      "unit": 115,
+      "title": "put on your shoes put your shoes on (phrasal verbs 2)",
+      "page": 230,
+      "exercisePage": 231
+    }
+  ],
+  "sections": [
+    {
+      "title": "单元 1–115",
+      "page": 2
+    },
+    {
+      "title": "附录",
+      "page": 232
+    },
+    {
+      "title": "Additional exercises",
+      "page": 241
+    },
+    {
+      "title": "使用说明",
+      "page": 260
+    },
+    {
+      "title": "练习答案",
+      "page": 265
+    },
+    {
+      "title": "附加练习答案",
+      "page": 292
+    }
+  ]
+}

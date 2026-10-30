@@ -8,7 +8,7 @@ let recordingURL = '', recorder = null, stream = null;
 try { state = JSON.parse(readState(KEY) || 'null'); state = state ? validateIelts(state) : initialIelts(); } catch { state = initialIelts(); storageFailed = true; }
 const h = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid = () => crypto.randomUUID();
-function save() { if (storageFailed) return; try { writeState(KEY, JSON.stringify(state)); } catch { storageFailed = true; notify('无法保存雅思记录，请及时导出备份。'); } }
+function save() { if (storageFailed) return false; try { writeState(KEY, JSON.stringify(state)); return true; } catch { storageFailed = true; notify('无法保存雅思记录，请及时导出备份。'); return false; } }
 const nav = (page, label) => `<a class="i-link" href="#${page}">${label} ↗</a>`;
 const pill = text => `<span class="pill">${h(text)}</span>`;
 function noteField(key, label, placeholder = '', rows = 4) { return `<label for="i-${key}">${label}</label><textarea id="i-${key}" data-i-note="${key}" rows="${rows}" placeholder="${h(placeholder)}">${h(state.notes[key] || '')}</textarea>`; }
