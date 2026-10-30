@@ -14,7 +14,7 @@
 
 ## 部署与使用边界
 
-在原 `wrangler.jsonc` 中加入 `"ai": {"binding": "AI"}`；现有 D1 与 AUTH_PEPPER 保留，不迁移数据库、不创建 API key、不升级付费套餐。使用已有 `rate_limits` 表限制每站每天最多 20 次未命中缓存的生成尝试，单一来源每天最多 8 次，每次最多 7,000 输出 token；失败也计数，不自动重复调用。缓存命中不消耗本应用生成次数。Cloudflare 的额度按 UTC 日重置，即北京时间 08:00；账号上其他应用的使用也可能影响可用额度。
+在原 `wrangler.jsonc` 中加入 `"ai": {"binding": "AI"}`；现有 D1 与 AUTH_PEPPER 保留，不迁移数据库、不创建 API key、不升级付费套餐。使用已有 `rate_limits` 表限制每站每天最多 20 次未命中缓存的生成尝试，单一来源每天最多 8 次，每次最多 7,000 输出 token；失败也计数；仅在结构或覆盖检查不通过时自动修正重试一次，两次均计入额度，服务或额度错误不重试。缓存命中不消耗本应用生成次数。Cloudflare 的额度按 UTC 日重置，即北京时间 08:00；账号上其他应用的使用也可能影响可用额度。
 
 实现参考：[Cloudflare Pages AI binding](https://developers.cloudflare.com/pages/functions/bindings/#workers-ai)、[模型接口](https://developers.cloudflare.com/workers-ai/models/qwen3-30b-a3b-fp8/)、[JSON 输出](https://developers.cloudflare.com/workers-ai/features/json-mode/)、[Workers AI 额度说明](https://developers.cloudflare.com/workers-ai/platform/pricing/)。
 
@@ -30,4 +30,4 @@
 
 浏览器测试：`tests/browser-reading.mjs` 和 `tests/browser-quiz-audio.mjs`。通过 `LEXIDAY_PLAYWRIGHT_MODULE`、`LEXIDAY_CHROME_PATH` 指定隔离浏览器运行环境，`LEXIDAY_TEST_URL` 指定本地或已部署站点。阅读浏览器测试使用受控 API 响应验证完整段落、词卡、译文、手机布局、旧格式替换、刷新保存和服务不可用时的备用文章；真实 Cloudflare 生成另做线上检查。
 
-本次验证：119 项自动测试通过；隔离 Chrome 通过阅读、课后听力和原有单词听音输入流程检查。词卡只保存段落索引，避免为每个词重复保存整段正文。
+本次验证：120 项自动测试通过；隔离 Chrome 通过阅读、课后听力和原有单词听音输入流程检查。词卡只保存段落索引，避免为每个词重复保存整段正文。

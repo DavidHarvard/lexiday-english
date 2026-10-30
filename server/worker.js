@@ -38,10 +38,18 @@ export default {async fetch(request,env,ctx){
    const cacheKey=new Request(url.origin+'/api/reading-cache/'+READING_GENERATOR_VERSION+'/'+signature);
    const cached=await cache?.match(cacheKey);if(cached)return json(await cached.json());
    // A hard site-wide ceiling bounds use of the existing free AI allocation.
-   // No paid plan, API key, or automatic retry is created by this feature.
-   try{await limit(env.DB,'reading-ip:'+await digest(ip),8,86400);await limit(env.DB,'reading-global-v2',READING_DAILY_LIMIT,86400);}
+   // Each model attempt, including one content-repair retry, uses this ceiling.
+   try{await limit(env.DB,'reading-ip:'+await digest(ip),8,86400);}
    catch(error){if(error.status===429)throw new HttpError(429,'今日文章生成额度已用完，可先阅读完整主题文章，明天再生成。');throw error;}
-   let article;try{article=await generateReading(env.AI,prepared);}catch(error){console.error('Reading generation failed:',error.message);throw new HttpError(503,'今日文章生成暂未完成，已为你准备完整的主题文章，可稍后重试。');}
+   let article;
+   for(let attempt=0;attempt<2;attempt++){
+    try{await limit(env.DB,'reading-global-v2',READING_DAILY_LIMIT,86400);}catch(error){if(error.status===429)throw new HttpError(429,'今日文章生成额度已用完，可先阅读完整主题文章，明天再生成。');throw error;}
+    try{article=await generateReading(env.AI,prepared);break;}
+    catch(error){
+     if(attempt===0&&error.readingValidation){prepared={...prepared,messages:[...prepared.messages,{role:'user',content:'The draft did not meet the length, paragraph structure, or vocabulary requirements. Rewrite the whole story with 6 or more substantial connected paragraphs, at least 400 English words, at least 4 sentences in every paragraph, accurate Chinese translations, and all supplied vocabulary in natural contexts. Return the complete JSON object only.'}]};continue;}
+     console.error('Reading generation failed:',error.message);throw new HttpError(503,'今日文章生成暂未完成，已为你准备完整的主题文章，可稍后重试。');
+    }
+   }
    if(cache){const stored=new Response(JSON.stringify({article}),{headers:{'Content-Type':'application/json','Cache-Control':'public, max-age=604800'}});const pending=cache.put(cacheKey,stored);if(ctx?.waitUntil)ctx.waitUntil(pending);else await pending;}
    return json({article});
   }

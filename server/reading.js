@@ -19,6 +19,7 @@ export function prepareReadingRequest(input){
 export async function generateReading(ai,prepared){
  const messages=prepared.messages.map((m,i)=>i===0?{...m,content:m.content+' Use natural English collocations and correct noun countability. Name concrete details instead of repeating vague phrases such as a great facility. Use target words once or twice where possible, then use pronouns or synonyms. Each paragraph adds new events; avoid repeating the same happy conclusion. End on a concrete scene. 中文译文必须符合自然中文语序，准确保留意思，避免生硬逐词直译。 /no_think'}:m);
  const result=await ai.run(READING_MODEL,{messages,max_tokens:7000,temperature:.6,repetition_penalty:1.08,response_format:{type:'json_object'}});
+ try{
  let raw=result?.choices?.[0]?.message?.content??result?.response??result;
  if(typeof raw==='string')raw=JSON.parse(raw.replace(/^\s*<think>[\s\S]*?<\/think>\s*/,'').replace(/^```(?:json)?\s*|\s*```$/g,''));
  // Lodging is uncountable in the IELTS sense. Preserve valid phrases such as
@@ -29,4 +30,5 @@ export async function generateReading(ai,prepared){
  // Reject an otherwise fluent article that ignored the day's vocabulary.
  if(article.covered<Math.ceil(Math.min(prepared.targets.length,80)*.65))throw Error('文章未充分使用今日词汇。');
  return article;
+ }catch(error){error.readingValidation=true;throw error;}
 }

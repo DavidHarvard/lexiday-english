@@ -65,3 +65,11 @@ test('reading API supports guests, checks origin and vocabulary, and caps genera
   assert.equal((await call()).status,429);assert.equal((await env.DB.prepare('SELECT count(*) as n FROM users').first()).n,0);
  }finally{env.DB.close();}
 });
+test('one malformed draft is repaired once and both AI attempts consume the shared limit',async()=>{
+ let calls=0;const env={DB:database(),AI:{run:async()=>({response:++calls===1?'not JSON':readingLibrary[0]})}};
+ try{
+  const r=await worker.fetch(new Request('https://example.test/api/reading',{method:'POST',headers:{Origin:'https://example.test','Content-Type':'application/json'},body:JSON.stringify({ids:['furnished'],senseIds:[]})}),env,{});
+  assert.equal(r.status,200);assert.equal(calls,2);
+  const usage=await env.DB.prepare("SELECT count FROM rate_limits WHERE key LIKE 'reading-global-v2:%'").first();assert.equal(usage.count,2);
+ }finally{env.DB.close();}
+});
