@@ -43,7 +43,8 @@ try{
 
  const semantic=await fixture(stateFor('furnished','listen'));if(process.env.LEXIDAY_REAL_MEANING!=='1')await semantic.page.route('**/api/meaning-check',route=>route.fulfill({json:{...route.request().postDataJSON(),verdict:'correct'}}));await semantic.page.goto(base+'/#learn');await ready(semantic.page);await semantic.page.locator('#meaning-answer').fill('屋里已经有现成的家具');await semantic.page.locator('#meaning-submit').click();await semantic.page.getByRole('heading',{name:'本轮输入正确'}).waitFor();await semantic.context.close();
  for(const width of [1280,390]){
-  const layout=await open(stateFor('lease','detail'),{width});await layout.page.locator('.word-notes').waitFor();assert.ok(!/区别对比|拼写对比/.test(await layout.page.locator('.word-notes').innerText()));
+  const detail=stateFor('lease','detail'),layout=await open(detail,{width,auto:false});await layout.page.locator('.word-notes').waitFor();assert.ok(!/区别对比|拼写对比/.test(await layout.page.locator('.word-notes').innerText()));
+  await layout.page.waitForFunction(()=>window.__spoken.length===1);await layout.page.evaluate(()=>window.__utterance.onend());assert.deepEqual(await layout.page.evaluate(()=>window.__spoken),[activeExample(detail).en],'meaning details read only the example, without a question');
   const group=layout.page.locator('[data-note-group="形近词"]');assert.deepEqual(await group.locator('[data-note-word]').evaluateAll(nodes=>nodes.map(n=>n.dataset.noteWord)),['cease','tease']);
   const cease=await group.locator('[data-note-word="cease"]').boundingBox(),tease=await group.locator('[data-note-word="tease"]').boundingBox();assert.equal(Math.round(cease.x),Math.round(tease.x));assert.ok(tease.y>=cease.y+cease.height);
   assert.equal(await layout.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await layout.page.locator('.word-notes').screenshot({path:`outputs/context-meaning/lease-notes-${width}.png`});await layout.context.close();
