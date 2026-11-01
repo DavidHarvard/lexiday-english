@@ -1,22 +1,63 @@
-// One cancellable queue for autoplay and manual replay; stale callbacks never pass a test.
-export function createSpeechController({getSynthesis=()=>globalThis.speechSynthesis,makeUtterance=text=>new SpeechSynthesisUtterance(text),onError=()=>{}}={}){
- let generation=0,active=null;
- function stop(){generation++;active=null;getSynthesis()?.cancel();}
+// Word, sentence and quiz playback share one cancellable queue. Local English
+// voices are preferred; missing/broken engines fall back to same-origin audio.
+export function speechChunks(text,limit=380){
+ const words=String(text).trim().split(/\s+/),chunks=[];let chunk='';
+ for(const word of words){if(word.length>limit)throw Error('朗读文字过长。');if(chunk&&chunk.length+word.length+1>limit){chunks.push(chunk);chunk='';}chunk+=(chunk?' ':'')+word;}if(chunk)chunks.push(chunk);return chunks;
+}
+const audioCache=new Map();let cachedBytes=0;
+async function fetchSpeechAudio(text,signal){
+ if(audioCache.has(text)){const blob=audioCache.get(text);audioCache.delete(text);audioCache.set(text,blob);return blob;}
+ const response=await fetch('/api/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text}),signal});
+ if(!response.ok||!response.headers.get('Content-Type')?.startsWith('audio/'))throw Error('audio-unavailable');
+ const blob=await response.blob();if(blob.size<100)throw Error('audio-unavailable');audioCache.set(text,blob);cachedBytes+=blob.size;while(audioCache.size>64||cachedBytes>16*1024*1024){const oldest=audioCache.keys().next().value;cachedBytes-=audioCache.get(oldest).size;audioCache.delete(oldest);}return blob;
+}
+export function createSpeechController({getSynthesis=()=>globalThis.speechSynthesis,makeUtterance=text=>new SpeechSynthesisUtterance(text),makeAudio=()=>new Audio(),loadAudio=fetchSpeechAudio,createAudioUrl=blob=>URL.createObjectURL(blob),revokeAudioUrl=url=>URL.revokeObjectURL(url),onError=()=>{},setTimer=(fn,ms)=>{const timer=setTimeout(fn,ms);timer.unref?.();return timer;},clearTimer=clearTimeout}={}){
+ let generation=0,active=null,audio=null,objectUrl=null,request=null,timer=null,voiceCleanup=null,preferAudio=false;
+ function clearWatch(){if(timer!==null)clearTimer(timer);timer=null;}
+ function clearMedia(){if(audio){audio.onended=audio.onerror=audio.onplaying=audio.ontimeupdate=null;audio.pause();audio.removeAttribute?.('src');audio.load?.();audio=null;}if(objectUrl){revokeAudioUrl(objectUrl);objectUrl=null;}}
+ function stop(){generation++;active=null;clearWatch();voiceCleanup?.();voiceCleanup=null;request?.abort();request=null;clearMedia();try{getSynthesis()?.cancel();}catch{}}
  function play(texts,onEnd){
-  stop();const token=generation,synthesis=getSynthesis();
-  const queue=(Array.isArray(texts)?texts:[texts]).filter(Boolean).map(String);
-  if(!synthesis||!queue.length){onError('unavailable');return false;}
-  function next(){
-   if(token!==generation)return;
-   const text=queue.shift();if(!text){onEnd?.();return;}
-   try{
-    const utterance=makeUtterance(text);active=utterance;utterance.lang='en-US';utterance.rate=.88;
-    const voices=synthesis.getVoices(),voice=voices.find(v=>v.lang==='en-US')||voices.find(v=>v.lang?.startsWith('en'));
-    if(voice)utterance.voice=voice;
-    utterance.onend=()=>{if(token===generation){active=null;next();}};
-    utterance.onerror=event=>{if(token!==generation)return;active=null;generation++;if(!['canceled','interrupted'].includes(event.error))onError(event.error||'unavailable');};
-    synthesis.speak(utterance);
-   }catch{if(token===generation){generation++;onError('unavailable');}}
+  stop();const token=generation,synthesis=getSynthesis();let queue;
+  try{queue=(Array.isArray(texts)?texts:[texts]).filter(Boolean).flatMap(text=>speechChunks(text));}catch{onError('unavailable');return false;}
+  if(!queue.length){onError('unavailable');return false;}
+  const current=()=>token===generation;
+  const watch=(callback,ms)=>{clearWatch();timer=setTimer(()=>{timer=null;if(current())callback();},ms);};
+  function fail(reason){if(!current())return;stop();onError(reason||'unavailable');}
+  function next(){if(!current())return;clearWatch();active=null;clearMedia();const text=queue.shift();if(text===undefined){onEnd?.();return;}choose(text);}
+  async function media(text){
+   if(!current())return;clearWatch();active=null;
+   if(!loadAudio){fail('unavailable');return;}
+   preferAudio=true;request=new AbortController();const pending=request;
+   watch(()=>fail('audio-timeout'),30000);
+   try{const blob=await loadAudio(text,pending.signal);if(!current()||pending.signal.aborted)return;request=null;clearWatch();objectUrl=createAudioUrl(blob);const player=makeAudio();audio=player;player.preload='auto';player.volume=1;player.muted=false;player.playbackRate=.95;player.src=objectUrl;let started=false;
+    player.onplaying=()=>{if(current()&&audio===player){started=true;watch(()=>fail('audio-timeout'),30000);}};
+    player.ontimeupdate=()=>{if(current()&&audio===player&&started)watch(()=>fail('audio-timeout'),30000);};
+    player.onended=()=>{if(current()&&audio===player){if(started)next();else fail('audio-unavailable');}};
+    player.onerror=()=>{if(current()&&audio===player)fail('audio-unavailable');};
+    watch(()=>fail('audio-timeout'),15000);await player.play();
+   }catch(error){if(current())fail(error.name==='NotAllowedError'?'not-allowed':'audio-unavailable');}
+  }
+  function native(text,voice){
+   if(!current())return;
+   try{const utterance=makeUtterance(text);active=utterance;utterance.lang=voice.lang||'en-US';utterance.voice=voice;utterance.rate=.88;utterance.volume=1;
+    const recover=()=>{if(!current()||active!==utterance)return;active=null;clearWatch();try{synthesis.cancel();}catch{}void media(text);};
+    utterance.onstart=()=>{if(current()&&active===utterance)watch(recover,Math.max(20000,text.length*120+10000));};
+    utterance.onend=()=>{if(current()&&active===utterance)next();};
+    utterance.onerror=event=>{if(!current()||active!==utterance)return;if(event.error==='not-allowed'){fail('not-allowed');return;}recover();};
+    if(synthesis.paused)synthesis.resume?.();watch(recover,5000);synthesis.speak(utterance);
+   }catch{void media(text);}
+  }
+  function choose(text,waited=false){
+   if(!current())return;const voices=synthesis?.getVoices?.()||[],english=voices.filter(v=>/^en(?:[-_]|$)/i.test(v.lang||''));
+   // Remote browser voices can silently fail behind a firewall. The server
+   // route also covers devices with only Chinese voices, without OS changes.
+   const voice=english.find(v=>v.localService===true)||english.find(v=>v.localService===undefined);
+   if(voice&&!preferAudio){native(text,voice);return;}
+   if(!voices.length&&synthesis?.addEventListener&&!waited&&!preferAudio){
+    const ready=()=>{if(!current())return;clearWatch();voiceCleanup?.();voiceCleanup=null;choose(text,true);};
+    synthesis.addEventListener('voiceschanged',ready);voiceCleanup=()=>synthesis.removeEventListener('voiceschanged',ready);watch(ready,700);return;
+   }
+   void media(text);
   }
   next();return true;
  }
