@@ -1,18 +1,12 @@
+import {speechAudioCache} from './speech-cache.js';
 // Word, sentence and quiz playback share one cancellable queue. Local English
 // voices are preferred; missing/broken engines fall back to same-origin audio.
 export function speechChunks(text,limit=380){
  const words=String(text).trim().split(/\s+/),chunks=[];let chunk='';
  for(const word of words){if(word.length>limit)throw Error('朗读文字过长。');if(chunk&&chunk.length+word.length+1>limit){chunks.push(chunk);chunk='';}chunk+=(chunk?' ':'')+word;}if(chunk)chunks.push(chunk);return chunks;
 }
-const audioCache=new Map();let cachedBytes=0;
-async function fetchSpeechAudio(text,signal){
- if(audioCache.has(text)){const blob=audioCache.get(text);audioCache.delete(text);audioCache.set(text,blob);return blob;}
- const response=await fetch('/api/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text}),signal});
- if(!response.ok||!response.headers.get('Content-Type')?.startsWith('audio/'))throw Error('audio-unavailable');
- const blob=await response.blob();if(blob.size<100)throw Error('audio-unavailable');audioCache.set(text,blob);cachedBytes+=blob.size;while(audioCache.size>64||cachedBytes>16*1024*1024){const oldest=audioCache.keys().next().value;cachedBytes-=audioCache.get(oldest).size;audioCache.delete(oldest);}return blob;
-}
-export function createSpeechController({getSynthesis=()=>globalThis.speechSynthesis,makeUtterance=text=>new SpeechSynthesisUtterance(text),makeAudio=()=>new Audio(),loadAudio=fetchSpeechAudio,createAudioUrl=blob=>URL.createObjectURL(blob),revokeAudioUrl=url=>URL.revokeObjectURL(url),onError=()=>{},setTimer=(fn,ms)=>{const timer=setTimeout(fn,ms);timer.unref?.();return timer;},clearTimer=clearTimeout}={}){
- let generation=0,active=null,audio=null,objectUrl=null,request=null,timer=null,voiceCleanup=null,preferAudio=false;
+export function createSpeechController({getSynthesis=()=>globalThis.speechSynthesis,makeUtterance=text=>new SpeechSynthesisUtterance(text),makeAudio=()=>new Audio(),loadAudio=(text,signal)=>speechAudioCache.load(text,signal),prefetchAudio=texts=>speechAudioCache.prefetch(texts),createAudioUrl=blob=>URL.createObjectURL(blob),revokeAudioUrl=url=>URL.revokeObjectURL(url),onError=()=>{},setTimer=(fn,ms)=>{const timer=setTimeout(fn,ms);timer.unref?.();return timer;},clearTimer=clearTimeout}={}){
+ let generation=0,active=null,audio=null,objectUrl=null,request=null,timer=null,voiceCleanup=null,preferAudio=false,prefetchTexts=[];
  function clearWatch(){if(timer!==null)clearTimer(timer);timer=null;}
  function clearMedia(){if(audio){audio.onended=audio.onerror=audio.onplaying=audio.ontimeupdate=null;audio.pause();audio.removeAttribute?.('src');audio.load?.();audio=null;}if(objectUrl){revokeAudioUrl(objectUrl);objectUrl=null;}}
  function stop(){generation++;active=null;clearWatch();voiceCleanup?.();voiceCleanup=null;request?.abort();request=null;clearMedia();try{getSynthesis()?.cancel();}catch{}}
@@ -27,7 +21,7 @@ export function createSpeechController({getSynthesis=()=>globalThis.speechSynthe
   async function media(text){
    if(!current())return;clearWatch();active=null;
    if(!loadAudio){fail('unavailable');return;}
-   preferAudio=true;request=new AbortController();const pending=request;
+   preferAudio=true;prefetchAudio(prefetchTexts);request=new AbortController();const pending=request;
    watch(()=>fail('audio-timeout'),30000);
    try{const blob=await loadAudio(text,pending.signal);if(!current()||pending.signal.aborted)return;request=null;clearWatch();objectUrl=createAudioUrl(blob);const player=makeAudio();audio=player;player.preload='auto';player.volume=1;player.muted=false;player.playbackRate=.95;player.src=objectUrl;let started=false;
     player.onplaying=()=>{if(current()&&audio===player){started=true;watch(()=>fail('audio-timeout'),30000);}};
@@ -61,5 +55,10 @@ export function createSpeechController({getSynthesis=()=>globalThis.speechSynthe
   }
   next();return true;
  }
- return {play,stop};
+ function preload(texts){
+  prefetchTexts=[...new Set(texts.filter(Boolean).flatMap(text=>speechChunks(text)))];
+  const synthesis=getSynthesis(),voices=synthesis?.getVoices?.()||[],local=voices.some(v=>/^en(?:[-_]|$)/i.test(v.lang||'')&&v.localService!==false);
+  prefetchAudio(!prefetchTexts.length||local&&!preferAudio?[]:preferAudio||!synthesis||voices.length?prefetchTexts:[]);
+ }
+ return {play,stop,preload};
 }
