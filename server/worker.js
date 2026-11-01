@@ -1,3 +1,4 @@
+import {prepareMeaningRequest,judgeMeaning,meaningResult,MEANING_VERSION} from './meaning.js';
 import {prepareSpeechRequest,generateSpeech,SPEECH_VERSION} from './speech.js';
 import {validateState} from '../dist/engine.js';
 import {validateGrammar} from '../dist/grammar-model.js';
@@ -27,11 +28,22 @@ export default {async fetch(request,env,ctx){
  const url=new URL(request.url),path=url.pathname;
  if(!path.startsWith('/api/'))return env.ASSETS.fetch(request);
  try{
-  if(!env.DB||(!['/api/reading','/api/speech'].includes(path)&&(!env.AUTH_PEPPER||env.AUTH_PEPPER.length<32)))throw new HttpError(503,'账号服务尚未配置完成。访客学习仍可使用。');
+  if(!env.DB||(!['/api/reading','/api/speech','/api/meaning-check'].includes(path)&&(!env.AUTH_PEPPER||env.AUTH_PEPPER.length<32)))throw new HttpError(503,'账号服务尚未配置完成。访客学习仍可使用。');
   if(path==='/api/health'&&request.method==='GET'){await env.DB.prepare('SELECT id FROM users LIMIT 1').first();return json({ok:true,version:'accounts-v1'});}
   if(!['GET','POST','PUT'].includes(request.method))throw new HttpError(405,'不支持此操作。');
   if(request.method!=='GET'&&request.headers.get('Origin')!==url.origin)throw new HttpError(403,'请求来源不正确，请刷新网站后重试。');
   const ip=request.headers.get('CF-Connecting-IP')||'local';
+  if(path==='/api/meaning-check'&&request.method==='POST'){
+   let prepared;try{prepared=prepareMeaningRequest(await body(request));}catch(error){throw new HttpError(400,error.message);}
+   if(prepared.verdict!=='unknown')return json(meaningResult(prepared,prepared.verdict,'local'));
+   const cache=globalThis.caches?.default,key=new Request(url.origin+'/api/meaning-cache/'+MEANING_VERSION+'/'+await digest(JSON.stringify(prepared)));
+   const cached=await cache?.match(key);if(cached)return json(await cached.json());
+   let verdict='uncertain';
+   try{if(!env.AI?.run)throw Error('Meaning service unavailable');await limit(env.DB,'meaning-ip:'+await digest(ip),120,86400);await limit(env.DB,'meaning-global',300,86400);verdict=await judgeMeaning(env.AI,prepared);}catch{ return json(meaningResult(prepared,'uncertain','unavailable')); }
+   const result=meaningResult(prepared,verdict,'semantic');
+   if(cache&&verdict!=='uncertain'){const pending=cache.put(key,new Response(JSON.stringify(result),{headers:{'Content-Type':'application/json','Cache-Control':'public, max-age=604800'}}));if(ctx?.waitUntil)ctx.waitUntil(pending);else await pending;}
+   return json(result);
+  }
   if(path==='/api/speech'&&request.method==='POST'){
    let text;try{text=prepareSpeechRequest(await body(request));}catch(error){throw new HttpError(400,error.message);}
    const signature=await digest(text),cache=globalThis.caches?.default,cacheKey=new Request(url.origin+'/api/speech-cache/'+SPEECH_VERSION+'/'+signature);

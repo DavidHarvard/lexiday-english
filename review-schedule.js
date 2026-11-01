@@ -3,8 +3,8 @@ export const reviewGrades=[
  {grade:0,label:'看例句仍不认识',weight:0},
  {grade:1,label:'看到例句才认识',weight:.25},
  {grade:2,label:'看到拼写才认识',weight:.5},
- {grade:3,label:'听语境与英文解释后认识',weight:.75},
- {grade:4,label:'只听读音就认识',weight:1}
+ {grade:3,label:'听语境辅助理解',weight:.75},
+ {grade:4,label:'听例句理解词义',weight:1}
 ];
 export function scheduleReview(previous,grade){
  if(!Number.isInteger(grade)||grade<0||grade>4)throw Error('无效复习评级。');

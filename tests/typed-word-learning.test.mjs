@@ -34,9 +34,9 @@ test('wrong typed meaning and unknown both remain unpassed, then show another sa
   markListeningPlayed(state);answerListening(state,'光线');assert.equal(state.session.states['light-n'].known,1);assert.equal(state.session.states['light-n'].passed,false);
  }
 });
-test('audio cue changes require replay; unavailable speech cannot grant a pass',()=>{
- const state=study();reachListen(state);markListeningPlayed(state);
- setListeningCue(state,'context');assert.equal(state.session.listenPlayed,false);assert.throws(()=>answerListening(state,'光线'));
+test('standalone word cue is unavailable and incomplete sentence audio cannot grant a pass',()=>{
+ const state=study();reachListen(state);
+ assert.equal(setListeningCue(state,'word'),false);assert.equal(state.session.listenCue,'context');assert.equal(state.session.listenPlayed,false);assert.throws(()=>answerListening(state,'光线'));
  listeningUnavailable(state);assert.equal(state.session.audioUnavailable,true);assert.equal(state.session.states['light-n'].passed,false);
  markListeningPlayed(state);answerListening(state,'光线');assert.equal(state.session.states['light-n'].passed,true);
 });

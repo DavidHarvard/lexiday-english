@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
-import {initial,begin,localDay} from '../dist/engine.js';
+import {initial,begin,localDay,activeExample,audioQuestion} from '../dist/engine.js';
 const {chromium}=await import(process.env.LEXIDAY_PLAYWRIGHT_MODULE||'playwright');
 const browser=await chromium.launch({headless:true,...(process.env.LEXIDAY_CHROME_PATH?{executablePath:process.env.LEXIDAY_CHROME_PATH}:{})});
 const base=process.env.LEXIDAY_TEST_URL||'http://127.0.0.1:4192';
@@ -15,6 +15,7 @@ async function contextFor(state,viewport={width:1280,height:900}){
   Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[{lang:'en-US',name:'Test voice'}],cancel(){},speak(utterance){window.__speechLast=utterance;window.__speechLog.push(utterance.text);if(window.__speechAutoEnd)setTimeout(()=>utterance.onend?.(),30);}}});
  },{state});
  const page=await context.newPage();page.on('pageerror',error=>pageErrors.push(error.message));
+ await page.route('**/api/meaning-check',route=>route.fulfill({json:{...route.request().postDataJSON(),verdict:'incorrect'}}));
  return {context,page};
 }
 async function speechIncludes(page,text){await page.waitForFunction(value=>window.__speechLog.some(spoken=>spoken===value),text);}
@@ -27,7 +28,7 @@ async function finishVisual(page){
 try{
  const state=initial();state.plan.count=1;const {context,page}=await contextFor(state);
  await page.goto(base+'/#today');await page.locator('[data-action="start"]').first().click();
- await speechIncludes(page,'light');assert.equal(await page.locator('.bare-word').innerText(),'light');
+ await speechIncludes(page,'What does light mean in this sentence?');assert.equal(await page.locator('.bare-word').innerText(),'light');assert.equal(await page.evaluate(()=>window.__speechLog.includes('light')),false);
  await page.locator('[data-action="bare-no"]').click();const first=await page.locator('.example-sentence').innerText();await speechIncludes(page,first);
  await page.locator('[data-action="sense-yes"]').click();await page.locator('.detail-card').waitFor();
  await page.locator('[data-action="continue"]').click();await page.locator('#meaning-submit:not([disabled])').waitFor();
@@ -62,7 +63,7 @@ try{
  await mobile.context.close();
  const due=initial();due.plan.count=1;due.records['bright-adj']={wordId:'bright',level:2,due:localDay(),audioVerified:true};begin(due,localDay());
  const review=await contextFor(due);await review.page.goto(base+'/#learn');await review.page.locator('#meaning-submit:not([disabled])').waitFor();
- await speechIncludes(review.page,'bright');assert.equal(await review.page.locator('.options').count(),0);
+ await speechIncludes(review.page,activeExample(due).en);await speechIncludes(review.page,'What does bright mean in this sentence?');assert.equal(await review.page.locator('.options').count(),0);
  await review.page.locator('#meaning-answer').fill('明亮');await review.page.locator('#meaning-submit').click();await review.page.locator('.detail-card').waitFor();
  assert.equal(await review.page.evaluate(()=>JSON.parse(localStorage.getItem('lexiday.v1')).session.reviewGrade),4);
  await review.context.close();assert.deepEqual(pageErrors,[]);

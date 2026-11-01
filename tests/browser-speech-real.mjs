@@ -9,11 +9,11 @@ try{
  await context.addInitScript(()=>{window.__audioEvents=[];window.__audioPlayers=[];const NativeAudio=window.Audio;window.Audio=function(...args){const player=new NativeAudio(...args),index=window.__audioPlayers.length;window.__audioPlayers.push(player);for(const name of ['playing','ended','error'])player.addEventListener(name,()=>window.__audioEvents.push({index,name,currentTime:player.currentTime,duration:player.duration,muted:player.muted,volume:player.volume}));return player;};window.Audio.prototype=NativeAudio.prototype;});
  const page=await context.newPage(),errors=[],requests=[];page.on('pageerror',error=>errors.push(error.message));page.on('request',r=>{if(new URL(r.url()).pathname==='/api/speech')requests.push(JSON.parse(r.postData()).text);});
  await page.goto(base+'/#today',{timeout:60000});await page.locator('[data-action="start"]').first().click();
- await page.waitForFunction(()=>window.__audioEvents.some(e=>e.name==='ended'),null,{timeout:60000});
- const word=await page.locator('.bare-word').innerText();assert.equal(requests[0],word);
+ await page.waitForFunction(()=>window.__audioEvents.filter(e=>e.name==='ended').length===2,null,{timeout:60000});
+ const word=await page.locator('.bare-word').innerText();assert.notEqual(requests[0],word);assert.ok(requests.includes('What does '+word+' mean in this sentence?'));
  await page.locator('[data-action="bare-no"]').click();const example=await page.locator('.example-sentence').innerText();
- await page.waitForFunction(()=>window.__audioEvents.filter(e=>e.name==='ended').length>=3,null,{timeout:60000});assert.ok(requests.includes(example));
- await page.locator('[data-action="speak"]').first().click();await page.waitForFunction(()=>window.__audioEvents.filter(e=>e.name==='ended').length>=4,null,{timeout:60000});
+ await page.waitForFunction(()=>window.__audioEvents.filter(e=>e.name==='ended').length>=4,null,{timeout:60000});assert.ok(requests.includes(example));
+ await page.locator('[data-action="speak"]').first().click();await page.waitForFunction(()=>window.__audioEvents.filter(e=>e.name==='ended').length>=5,null,{timeout:60000});
  assert.equal(requests.filter(text=>text===example).length,1,'manual replay should reuse the cached audio');
  // Verify actual audio output has a decodable, non-silent English waveform.
  const sample=await context.request.post(base+'/api/speech',{headers:{Origin:base},data:{text:'The apartment is fully furnished.'},timeout:45000});assert.equal(sample.status(),200);assert.match(sample.headers()['content-type'],/^audio\/(mpeg|wav|ogg)/);const bytes=await sample.body();

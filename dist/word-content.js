@@ -44,17 +44,31 @@ export function normalizeMeaning(text){
   .replace(/\s+/g,'').replace(/[。.!！?？]+$/,'');
 }
 const extraAliases={
+ '配备家具的':['带家具的','带有家具的','有家具的','配有家具的','家具齐全的','附带家具的','配备了家具的'],
+ '押金':['保证金','租房押金'], '存入款项':['存款','存钱','存入银行','把钱存进银行'],
+ '租约':['租赁合同','租赁协议'],
  '居民':['住户','居住者'], '住宅的':['居住的','住宅用的'], '光线':['光','光亮'],
  '学习':['学','学会'], '书':['书籍'], '预订':['预定'], '明亮的':['明亮','亮的'],
  '轻的':['轻','重量轻的'], '发现':['发觉'], '阻碍':['妨碍','阻挡'],
  '地址':['住址'], '目标':['目的'], '住宅':['住所','住处'],
 };
+export function aliasesForMeaning(meaning){
+ const values=splitDictionaryGloss(meaning).flatMap(part=>part.meaning.replace(/[（(][^）)]*[）)]/g,'').split(/[；;,，、/]|\s+or\s+/)),aliases=new Set();
+ for(const value of values){const key=normalizeMeaning(value);if(!key)continue;for(const raw of [key,...(extraAliases[key]||[])]){const alias=normalizeMeaning(raw);aliases.add(alias);if(alias.endsWith('的')&&alias.length>1)aliases.add(alias.slice(0,-1));}}
+ return [...aliases];
+}
 export function meaningAliases(word,sense,cue='word',example){
  const entries=cue==='context'?[studyMeaning(word,sense,example)]:entriesForSense(word,sense);
- const values=entries.flatMap(entry=>splitDictionaryGloss(entry.meaning).flatMap(part=>part.meaning.replace(/[（(][^）)]*[）)]/g,'').split(/[；;,，、/]|\s+or\s+/)));
- const aliases=new Set();
- for(const value of values){const key=normalizeMeaning(value);if(!key)continue;aliases.add(key);if(key.endsWith('的')&&key.length>1)aliases.add(key.slice(0,-1));for(const synonym of extraAliases[key]||[])aliases.add(synonym);}
- return [...aliases];
+ return [...new Set(entries.flatMap(entry=>aliasesForMeaning(entry.meaning)))];
+}
+export function meaningDecision(word,sense,input,example){
+ if(checkMeaning(word,sense,input,'context',example))return 'correct';
+ const value=normalizeMeaning(input);if(!value||value.length>200||/[<>]/.test(value)||!/[\u3400-\u9fff]/.test(value))return 'incorrect';
+ const accepted=new Set(meaningAliases(word,sense,'context',example));
+ const others=new Set(wordEntries(word).flatMap(entry=>aliasesForMeaning(entry.meaning)).filter(alias=>!accepted.has(alias)));
+ const parts=value.split(/[；;,，、/]|或者|或是/).map(normalizeMeaning).filter(Boolean);
+ if(parts.some(part=>others.has(part)||[...accepted].some(alias=>part==='不是'+alias||part==='并非'+alias)))return 'incorrect';
+ return 'unknown';
 }
 export function checkMeaning(word,sense,input,cue='word',example){
  const value=normalizeMeaning(input);

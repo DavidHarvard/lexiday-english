@@ -12,3 +12,8 @@ export function deduplicateNotes(notes){
  }
  return [...result.values()];
 }
+export function groupNotes(notes){
+ const groups=new Map(),order=['近义词','形近词','同词族'];
+ for(const note of deduplicateNotes(notes)){const type=note.type||note.types?.[0]||'关联词';if(!groups.has(type))groups.set(type,[]);groups.get(type).push(note);}
+ return [...groups].sort(([a],[b])=>(order.includes(a)?order.indexOf(a):99)-(order.includes(b)?order.indexOf(b):99)).map(([type,notes])=>({type,notes}));
+}
