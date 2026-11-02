@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import {mkdirSync} from 'node:fs';
+import {initial,begin,localDay,dayLog,activeExample,dailyReadingPlan,addDays} from '../dist/engine.js';
+import {wordMap} from '../dist/data.js';
+import {readingLibrary} from '../dist/reading-library.js';
+import {assembleArticle,readingTargets} from '../dist/reading-model.js';
+import {meaningAliases} from '../dist/word-content.js';
+const {chromium}=await import(process.env.LEXIDAY_PLAYWRIGHT_MODULE||'playwright');
+const browser=await chromium.launch({headless:true,executablePath:process.env.LEXIDAY_CHROME_PATH||'C:/Program Files/Google/Chrome/Application/chrome.exe',proxy:process.env.LEXIDAY_BROWSER_PROXY?{server:process.env.LEXIDAY_BROWSER_PROXY}:undefined});
+const base=process.env.LEXIDAY_TEST_URL||'http://127.0.0.1:4203',errors=[],day=localDay();
+mkdirSync('outputs/daily-memory',{recursive:true});
+const custom={id:'reading:kingfisher',word:'kingfisher',ipa:'',notes:[],senses:[{id:'reading:kingfisher:1',pos:'n.',meaning:'翠鸟',distractors:[],examples:[{en:'A kingfisher waited above the stream.',zh:'一只翠鸟在溪流上方等候。'},{en:'We saw a kingfisher dive into the water.',zh:'我们看见一只翠鸟俯冲入水。'}]}]};
+async function fixture(state,width=1280){
+ const context=await browser.newContext({viewport:{width,height:900},timezoneId:'Asia/Shanghai'});
+ await context.addInitScript(state=>{if(!localStorage.getItem('lexiday.v1'))localStorage.setItem('lexiday.v1',JSON.stringify(state));window.__spoken=[];Object.defineProperty(window,'SpeechSynthesisUtterance',{value:class{constructor(text){this.text=text;}}});Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[{lang:'en-US',localService:true}],cancel(){},speak(u){window.__spoken.push(u.text);window.__last=u;setTimeout(()=>u.onend?.(),15);}}});},state);
+ const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));let readingCalls=0,plannedIds=[];
+ await page.route('**/api/reading',async route=>{readingCalls++;const input=route.request().postDataJSON();plannedIds=input.ids;const source=structuredClone(readingLibrary[0]);source.paragraphs[0].en+=' A kingfisher flashed past the kitchen window.';source.paragraphs[0].zh+='一只翠鸟从厨房窗前闪过。';await route.fulfill({json:{article:assembleArticle(source,readingTargets(input.ids,input.senseIds,input.customWords))}});});
+ await page.route('**/api/word-lookup',route=>route.fulfill({json:{word:custom}}));
+ return {context,page,get readingCalls(){return readingCalls;},get plannedIds(){return plannedIds;}};
+}
+const saved=page=>page.evaluate(()=>JSON.parse(localStorage.getItem('lexiday.v1')));
+async function answer(page){await page.locator('#meaning-submit:not([disabled])').waitFor();const s=await saved(page),t=s.session.current,w=wordMap[t.wordId]||s.customWords[t.wordId],sense=w.senses.find(x=>x.id===t.senseId);await page.locator('#meaning-answer').fill(meaningAliases(w,sense,'context',activeExample(s))[0]);await page.locator('#meaning-submit').click();await page.locator('.detail-card').waitFor();}
+async function selectWord(page,text){
+ const point=await page.evaluate(text=>{const nodes=document.querySelectorAll('.article-body [data-reading-paragraph]');for(const p of nodes){const walker=document.createTreeWalker(p,NodeFilter.SHOW_TEXT);let n;while(n=walker.nextNode()){const i=n.textContent.toLowerCase().indexOf(text.toLowerCase());if(i>=0){const r=document.createRange();r.setStart(n,i);r.setEnd(n,i+text.length);p.scrollIntoView({block:'center'});const b=r.getBoundingClientRect();return {x:b.x+b.width/2,y:b.y+b.height/2};}}}throw Error('word missing '+text);},text);
+ await page.mouse.dblclick(point.x,point.y);await page.locator('#reading-selection .reading-word-card h2').waitFor();
+}
+try{
+ const s=initial();s.plan.count=2;begin(s,day);const f=await fixture(s),p=f.page;await p.goto(base+'/#learn');await p.waitForFunction(()=>window.__spoken.length===1);assert.deepEqual(await p.evaluate(()=>window.__spoken),['light']);
+ await p.waitForFunction(()=>JSON.parse(localStorage.getItem('lexiday.v1')).days[Object.keys(JSON.parse(localStorage.getItem('lexiday.v1')).days)[0]].article?.mode==='generated');assert.equal(f.plannedIds.length,2);assert.equal(f.readingCalls,1);
+ await p.locator('[data-action="bare-yes"]').click();await p.locator('.listening-recall').waitFor();assert.equal(await p.locator('.example-sentence').count(),0);await answer(p);await p.waitForTimeout(60);
+ assert.deepEqual((await p.evaluate(()=>window.__spoken)).slice(-2),['light',activeExample(await saved(p)).en]);assert.equal((await saved(p)).records['light-n'].audioVerified,true);assert.equal(await p.locator('.learning-side .personal-notes').count(),1);assert.ok(!(await p.locator('.learning-side').innerText()).includes('听音验证'));
+ await p.locator('#word-note-input').fill('It is similar to the word communicate');await p.locator('#word-note-form button').click();await p.locator('.personal-note-history blockquote').waitFor();assert.equal(await p.locator('.personal-note-history time').innerText(),'— '+day.replaceAll('-','.'));
+ await p.reload();await p.locator('.personal-note-history blockquote').waitFor();assert.match(await p.locator('.personal-note-history').innerText(),/similar to the word communicate/);
+ await p.screenshot({path:'outputs/daily-memory/notes-desktop.png',fullPage:true});await p.locator('.learning-side').screenshot({path:'outputs/daily-memory/notes-panel.png'});
+ let guard=20;while((await saved(p)).session.stage!=='done'&&guard--){const current=(await saved(p)).session;
+  if(current.stage==='detail')await p.locator('[data-action="continue"]').click();else if(current.stage==='bare')await p.locator('[data-action="bare-yes"]').click();else if(current.stage==='sentence'){await p.locator('[data-action="sense-yes"]').click();}else if(current.stage==='listen')await answer(p);else if(current.stage==='rest'){await p.locator('#rest-button:not([disabled])').waitFor({timeout:12000});await p.locator('#rest-button').click();}else throw Error('unexpected stage '+current.stage);
+ }assert.ok(guard>0);const calls=f.readingCalls;await p.locator('[data-action="navigate"][data-to="reading"]').click();await p.locator('.article-body').waitFor();assert.equal(f.readingCalls,calls,'opening reading reuses the prepared article');
+ await selectWord(p,'furnished');assert.equal(await p.locator('#reading-selection h2').innerText(),'furnished');assert.equal((await saved(p)).records['furnished-adj-1'].due,addDays(day,1));
+ await selectWord(p,'kingfisher');assert.equal(await p.locator('#reading-selection h2').innerText(),'kingfisher');assert.match(await p.locator('#reading-selection').innerText(),/翠鸟/);assert.equal((await saved(p)).records[custom.senses[0].id].due,addDays(day,1));await p.screenshot({path:'outputs/daily-memory/reading-selection.png',fullPage:true});
+ await p.locator('nav a[href="#quiz"]').click();await p.locator('[data-action="quiz-start"]').click();await p.locator('[data-action="option"]:not([disabled])').first().waitFor();let q=(await saved(p)).days[day].quiz;assert.equal(q.version,2);assert.equal(q.questions.length%3,0);assert.deepEqual(q.questions.slice(0,3).map(x=>x.kind),['content','content','meaning']);assert.ok(q.questions[0].en.split(/\s+/).length>=90);
+ for(let i=0;i<3;i++){await p.locator('[data-action="option"]:not([disabled])').first().waitFor();q=(await saved(p)).days[day].quiz;const current=q.questions[q.index],correct=current.options.indexOf(current.meaning);await p.locator(`[data-action="option"][data-index="${correct}"]`).click();await p.locator('.quiz-transcript').waitFor();if(i<2)await p.locator('[data-action="quiz-next"]').click();}
+ q=(await saved(p)).days[day].quiz;assert.equal(q.answers.length,3);assert.ok(q.answers.every(a=>a.correct));assert.equal(q.answers[1].assisted,true);await f.context.close();
+ const review=initial();review.plan.count=1;review.records['commute-v-1']={wordId:'commute',level:1,due:day,audioVerified:true};const sense=wordMap.commute.senses[0];delete review.records['commute-v-1'];review.records[sense.id]={wordId:'commute',level:1,due:day,audioVerified:true};review.wordNotes={commute:[{id:'previous-note',text:'It is similar to the word communicate',day:addDays(day,-1),createdAt:new Date().toISOString()}]};begin(review,day);
+ const mobile=await fixture(review,390);await mobile.page.goto(base+'/#learn');await answer(mobile.page);await mobile.page.locator('.personal-note-history').waitFor();assert.match(await mobile.page.locator('.personal-note-history').innerText(),/similar to the word communicate/);await mobile.page.locator('.detail-card > .forget-word').click();assert.equal((await saved(mobile.page)).records[sense.id].pending,true);assert.equal((await saved(mobile.page)).records[sense.id].due,day);assert.equal((await saved(mobile.page)).session.states[sense.id].passed,false);
+ assert.equal(await mobile.page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1),false);await mobile.page.screenshot({path:'outputs/daily-memory/notes-mobile.png',fullPage:true});await mobile.page.locator('.personal-notes').screenshot({path:'outputs/daily-memory/notes-panel-mobile.png'});await mobile.context.close();assert.deepEqual(errors,[]);
+ console.log('Daily memory browser checks passed: distinct audio, fast-track, immediate pass, dated notes/reload/mobile, preparation during study, real double-click collection, next-day custom words, long three-question listening and same-day forgetting.');
+}finally{await browser.close();}

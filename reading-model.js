@@ -6,7 +6,7 @@ export const countWords=text=>(String(text).match(/[A-Za-z]+(?:['’-][A-Za-z]+)
 export const escapeRegExp=text=>String(text).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
 const irregular={be:['is','are','was','were','been'],bring:['brought'],buy:['bought'],come:['came'],do:['did','done'],find:['found'],get:['got'],go:['went','gone'],have:['has','had'],hold:['held'],keep:['kept'],know:['knew','known'],lead:['led'],leave:['left'],make:['made'],meet:['met'],read:['read'],run:['ran'],say:['said'],see:['saw','seen'],send:['sent'],take:['took','taken'],teach:['taught'],think:['thought'],write:['wrote','written'],child:['children'],person:['people']};
 export function wordForms(id){
- const forms=new Set([id]);
+ if(id.startsWith('reading:'))id=id.slice(8);const forms=new Set([id]);
  if(/^[a-z]+$/i.test(id)){
   const word=wordMap[id],pos=word?wordEntries(word).map(e=>e.pos).join(' '):'';
   if(/\bn\.|\bv\./.test(pos)){
@@ -26,11 +26,11 @@ export function findWord(text,id){
  const match=new RegExp(`(?<![A-Za-z])(?:${pattern})(?![A-Za-z])`,'i').exec(text);
  return match?{form:match[0],index:match.index}:null;
 }
-export function readingTargets(ids,learnedSenseIds=[]){
- if(!Array.isArray(ids)||!ids.length||ids.some(id=>typeof id!=='string'||!Object.hasOwn(wordMap,id)))throw Error('阅读词汇无效，请先完成今日学习。');
+export function readingTargets(ids,learnedSenseIds=[],customWords={}){
+ if(!Array.isArray(ids)||!ids.length||ids.some(id=>typeof id!=='string'||!Object.hasOwn(wordMap,id)&&!Object.hasOwn(customWords,id)))throw Error('阅读词汇无效，请先完成今日学习。');
  if(!Array.isArray(learnedSenseIds)||learnedSenseIds.some(id=>typeof id!=='string'))throw Error('阅读词义无效。');
  return [...new Set(ids)].map(wordId=>{
-  const word=wordMap[wordId],sense=word.senses.find(s=>learnedSenseIds.includes(s.id))||word.senses[0],entry=studyMeaning(word,sense,examplesForSense(word,sense)[0]);
+  const word=wordMap[wordId]||customWords[wordId],sense=word.senses.find(s=>learnedSenseIds.includes(s.id))||word.senses[0],entry=studyMeaning(word,sense,examplesForSense(word,sense)[0]);
   return {wordId,senseId:sense.id,pos:entry.pos,meaning:entry.meaning};
  });
 }
@@ -51,9 +51,9 @@ export function assembleArticle(raw,targets,{mode='generated',sourceId='daily',d
  const coveredIds=new Set(glossary.map(g=>g.wordId));
  return {version:READING_VERSION,title:raw.title.trim(),subtitle:raw.subtitle.trim(),paragraphs,glossary,wordCount,covered:glossary.length,total:targets.length,missing:targets.filter(t=>!coveredIds.has(t.wordId)).map(t=>t.wordId),targetWordIds:targets.map(t=>t.wordId),mode,sourceId,collection:false};
 }
-export function validateReadingArticle(article){
+export function validateReadingArticle(article,customWords={}){
  if(!article||article.version!==READING_VERSION||!['generated','library'].includes(article.mode)||typeof article.sourceId!=='string'||article.sourceId.length>100)throw Error('阅读版本无效。');
- const targets=readingTargets(article.targetWordIds,article.glossary?.map(g=>g.senseId)||[]);
+ const targets=readingTargets(article.targetWordIds,article.glossary?.map(g=>g.senseId)||[],customWords);
  const rebuilt=assembleArticle(article,targets,{mode:article.mode,sourceId:article.sourceId});
  if(article.covered!==rebuilt.covered||article.total!==rebuilt.total||article.wordCount!==rebuilt.wordCount||!Array.isArray(article.missing)||JSON.stringify(article.missing)!==JSON.stringify(rebuilt.missing)||!Array.isArray(article.glossary)||article.glossary.length!==rebuilt.glossary.length||article.glossary.some((g,i)=>['wordId','senseId','paragraphIndex','form','en','zh','pos','meaning'].some(key=>g[key]!==rebuilt.glossary[i][key])))throw Error('阅读词卡与正文不一致。');
  return rebuilt;

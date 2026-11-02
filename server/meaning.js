@@ -1,8 +1,9 @@
 import {wordMap} from '../dist/data.js';
+import {validateCustomWord} from '../dist/personal-words.js';
 import {examplesForSense,studyMeaning,wordEntries,normalizeMeaning,meaningDecision} from '../dist/word-content.js';
 export const MEANING_VERSION='context-paraphrase-v1';
 export function prepareMeaningRequest(input){
- const word=wordMap[input?.wordId],sense=word?.senses.find(s=>s.id===input.senseId);
+ const word=wordMap[input?.wordId]||(input?.customWord?.id===input?.wordId?validateCustomWord(input.customWord):null),sense=word?.senses.find(s=>s.id===input.senseId);
  if(!sense||!Number.isSafeInteger(input.round)||input.round<1||input.round>10000||typeof input.input!=='string'||!input.input.trim()||input.input.length>200||/[<>]/.test(input.input))throw Error('词义核对请求无效。');
  const examples=examplesForSense(word,sense),example=examples[(input.round-1)%examples.length];if(!example)throw Error('本题缺少例句。');
  const target=studyMeaning(word,sense,example),answer=normalizeMeaning(input.input),verdict=meaningDecision(word,sense,answer,example);

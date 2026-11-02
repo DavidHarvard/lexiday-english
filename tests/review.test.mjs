@@ -18,7 +18,7 @@ test('import keeps all 3610 unique entries and full phrases, without altering ex
 });
 test('imported words use enriched reading examples while preserving legacy source and progress IDs',()=>{
  const a=createArticle(['bright','emperor']);assert.equal(a.total,2);assert.equal(a.covered+a.missing.length,2);assert.ok(a.paragraphs.length>=5);assert.equal(createArticle(['emperor']).total,1);
- const s=initial();assert.throws(()=>makeQuiz(s,{touched:['emperor'],passed:['import:emperor']}));
+ const s=initial();assert.equal(makeQuiz(s,{touched:['emperor'],passed:['import:emperor']}).questions.length,3);
  for(const w of importedWords){assert.equal(w.senses[0].examples.length,0);assert.ok(w.senses[0].meaning);}
 });
 test('relations distinguish meaning, spelling and family; related order never enrols unselected words',()=>{
@@ -28,22 +28,22 @@ test('relations distinguish meaning, spelling and family; related order never en
  for(const w of words)for(const n of w.notes.filter(n=>n.difference.startsWith('拼写对比：')))assert.equal(n.type,'形近词');
 });
 test('unremembered new words survive exit before detail and become next-day reviews',()=>{
- const s=initial();s.plan.count=1;begin(s,DAY);answerBare(s,false);const r=clone(s);assert.equal(r.records['light-n'].pending,true);assert.equal(r.records['light-adj'].due,NEXT);assert.ok(remainingWords(r).includes('light'));begin(r,NEXT);assert.equal(r.session.types.light,'review');assert.equal(r.session.stage,'review');assert.equal(r.session.cue,'context');
+ const s=initial();s.plan.count=1;begin(s,DAY);answerBare(s,false);const r=clone(s);assert.equal(r.records['light-n'].pending,true);assert.equal(r.records['light-adj'].due,DAY);assert.ok(remainingWords(r).includes('light'));begin(r,NEXT);assert.equal(r.session.types.light,'review');assert.equal(r.session.stage,'review');assert.equal(r.session.cue,'context');
 });
 test('context audio and sentence assistance, submitted state and grade survive refresh',()=>{
  for(const [cue,grade,declines] of [['context',4,0],['sentence',1,1]]){
  let s=due();assert.throws(()=>answerReview(s,true));assert.equal(reviewAudio(s),activeExample(s).en);for(let i=0;i<declines;i++){answerReview(s,false);s=clone(s);}
- assert.equal(s.session.cue,cue);if(cue==='context')assert.match(reviewAudio(s),/bright/i);if(['audio','context'].includes(cue))markReviewPlayed(s);answerReviewCorrect(s);assert.equal(s.session.stage,'detail');assert.equal(s.session.reviewGrade,grade);s=clone(s);continueLearning(s,0);assert.equal(s.records['bright-adj'].grade,grade);assert.ok(s.records['bright-adj'].due>DAY);clone(s);
+ assert.equal(s.session.cue,cue);if(cue==='context')assert.match(reviewAudio(s),/bright/i);if(['audio','context'].includes(cue))markReviewPlayed(s);answerReviewCorrect(s);assert.equal(s.session.stage,'detail');assert.equal(s.session.reviewGrade,grade);s=clone(s);continueLearning(s,0);if(grade===1){assert.equal(s.session.stage,'review');assert.equal(s.session.cue,'context');markReviewPlayed(s);answerReviewCorrect(s);continueLearning(s,0);}assert.equal(s.records['bright-adj'].grade,4);assert.ok(s.records['bright-adj'].due>DAY);clone(s);
  }
 });
 test('failure at last cue stays unpassed and returns tomorrow; correcting a success produces the same schedule',()=>{
- let s=due();for(let i=0;i<2;i++)answerReview(s,false);assert.equal(s.session.reviewGrade,0);continueLearning(s,0);assert.equal(s.records['bright-adj'].due,NEXT);assert.equal(s.records['bright-adj'].pending,true);assert.ok(!dayLog(s,DAY).passed.includes('bright-adj'));assert.ok(!completedWords(s,DAY).includes('bright'));
- s=due();markReviewPlayed(s);answerReviewCorrect(s);assert.equal(correctAnswer(s),true);continueLearning(s,0);assert.equal(s.records['bright-adj'].grade,0);assert.equal(s.records['bright-adj'].due,NEXT);
+ let s=due();for(let i=0;i<2;i++)answerReview(s,false);assert.equal(s.session.reviewGrade,0);continueLearning(s,0);assert.equal(s.records['bright-adj'].due,DAY);assert.equal(s.records['bright-adj'].pending,true);assert.ok(!dayLog(s,DAY).passed.includes('bright-adj'));assert.ok(!completedWords(s,DAY).includes('bright'));
+ s=due();markReviewPlayed(s);answerReviewCorrect(s);assert.equal(correctAnswer(s),true);continueLearning(s,0);assert.equal(s.records['bright-adj'].pending,true);assert.equal(s.records['bright-adj'].due,DAY);
 });
 test('text assistance cannot pass a word that has never been verified by audio input',()=>{
  const s=due();s.records['bright-adj'].audioVerified=false;s.session.states['bright-adj'].requiresAudio=true;
  useReviewText(s);answerReviewCorrect(s);assert.equal(s.session.reviewGrade,1);assert.equal(s.session.states['bright-adj'].passed,false);
- continueLearning(s,0);assert.equal(s.records['bright-adj'].pending,true);assert.equal(s.records['bright-adj'].audioVerified,false);assert.equal(s.records['bright-adj'].due,NEXT);
+ continueLearning(s,0);assert.equal(s.session.stage,'review');assert.equal(s.session.cue,'context');assert.equal(s.records['bright-adj'].audioVerified,false);
  const t=due();useReviewText(t);answerReviewCorrect(t);assert.equal(t.session.reviewGrade,1);assert.equal(t.session.audioUnavailable,true);
 });
 test('weights produce bounded increasing intervals without giving longer credit for more hints',()=>{

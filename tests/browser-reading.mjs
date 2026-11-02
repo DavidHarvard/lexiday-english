@@ -22,7 +22,7 @@ async function open(state){
 try{
  const {state,article}=fixture(),{context,page}=await open(state);let calls=0;
  await page.route('**/api/reading',async route=>{calls++;await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({article})});});
- await page.goto(base+'/#reading');await page.locator('[data-action="article"]').click();await page.locator('.article-body').waitFor();
+ await page.goto(base+'/#reading');await page.locator('.article-body').waitFor();await page.waitForFunction(()=>document.querySelector('.article .pill')?.textContent==='今日专属文章');
  assert.equal(await page.locator('.article-body > p').count(),6);assert.ok(!(await page.locator('.article').innerText()).includes('例句合集'));
  await page.locator('.article-body [data-id="landlord"][data-paragraph="3"]').click();
  assert.ok((await page.locator('.glossary').innerText()).includes(article.paragraphs[3].en));
@@ -33,7 +33,7 @@ try{
  await page.reload();await page.locator('.article-body').waitFor();assert.equal(calls,1,'saved article must not regenerate on refresh');
  assert.equal(await page.locator('.article h1').innerText(),article.title);await context.close();
  const offline=await open(fixture().state);await offline.page.route('**/api/reading',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({error:'Temporarily unavailable'})}));
- await offline.page.goto(base+'/#reading');await offline.page.locator('[data-action="article"]').click();await offline.page.locator('.article-body').waitFor();
+ await offline.page.goto(base+'/#reading');await offline.page.locator('.article-body').waitFor();
  assert.equal(await offline.page.locator('.article-body > p').count(),6);assert.match(await offline.page.locator('.article').innerText(),/完整主题文章/);
  assert.equal(await offline.page.evaluate(()=>JSON.parse(localStorage.getItem('lexiday.v1')).days[Object.keys(JSON.parse(localStorage.getItem('lexiday.v1')).days)[0]].article.mode),'library');
  await offline.context.close();assert.deepEqual(errors,[]);

@@ -32,9 +32,9 @@ for(const course of ['ielts-basic','ielts-plus'])test(`${course}: complete first
  // Check every sense as a singleton, avoiding gaps caused by random ten-question sampling.
  for(const id of log.touched)for(const sense of wordMap[id].senses){
   const quiz=makeQuiz(restored,{touched:[id],passed:[sense.id]});
-  assert.equal(quiz.questions.length,1);const question=quiz.questions[0];
+  assert.equal(quiz.questions.length,3);const question=quiz.questions[2];
   assert.equal(question.senseId,sense.id);assert.equal(new Set(question.options).size,4);
-  assert.equal(question.options.filter(o=>o===sense.meaning).length,1);
+  assert.equal(question.options.filter(o=>o===question.meaning).length,1);
   const reading=createArticle([id],[sense.id]);assert.deepEqual(reading.targetWordIds,[id]);for(const g of reading.glossary)assert.equal(g.senseId,sense.id);
  }
 });

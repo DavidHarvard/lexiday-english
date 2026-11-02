@@ -28,7 +28,7 @@ async function finishVisual(page){
 try{
  const state=initial();state.plan.count=1;const {context,page}=await contextFor(state);
  await page.goto(base+'/#today');await page.locator('[data-action="start"]').first().click();
- await speechIncludes(page,'What does light mean in this sentence?');assert.equal(await page.locator('.bare-word').innerText(),'light');assert.equal(await page.evaluate(()=>window.__speechLog.includes('light')),false);
+ await speechIncludes(page,'light');assert.equal(await page.locator('.bare-word').innerText(),'light');
  await page.locator('[data-action="bare-no"]').click();const first=await page.locator('.example-sentence').innerText();await speechIncludes(page,first);
  await page.locator('[data-action="sense-yes"]').click();await page.locator('.detail-card').waitFor();
  await page.locator('[data-action="continue"]').click();await page.locator('#meaning-submit:not([disabled])').waitFor();

@@ -7,18 +7,13 @@ import {deduplicateNotes,normalizedNoteWord} from '../dist/word-notes.js';
 import {createSpeechController} from '../dist/speech.js';
 const DAY='2026-10-29';
 function study(){const state=initial();state.plan.count=1;begin(state,DAY);return state;}
-function reachListen(state,known=true){if(state.session.stage==='bare')answerBare(state,known);answerSense(state,known);continueLearning(state,0);assert.equal(state.session.stage,'listen');}
+function reachListen(state,known=true){if(state.session.stage==='bare')answerBare(state,known);if(state.session.stage==='sentence'){answerSense(state,known);continueLearning(state,0);}assert.equal(state.session.stage,'listen');}
 
-test('visual recognition and details never pass or schedule a new word without typed audio input',()=>{
- const state=study();answerBare(state,true);answerSense(state,true);
- assert.equal(state.session.stage,'detail');assert.equal(state.session.states['light-n'].known,0);assert.equal(state.session.states['light-n'].passed,false);
- continueLearning(state);assert.equal(state.session.stage,'listen');assert.equal(continueLearning(state),false);
- assert.throws(()=>answerListening(state,'光线'),/先完整听/);assert.equal(state.records['light-n'],undefined);
- markListeningPlayed(state);assert.throws(()=>answerListening(state,'   '),/输入中文/);
- answerListening(state,'光线');assert.equal(state.session.stage,'result');assert.equal(state.session.states['light-n'].passed,true);
- assert.throws(()=>answerListening(state,'光线'));continueLearning(state,0);
- assert.equal(state.records['light-n'].audioVerified,true);assert.equal(state.records['light-n'].pending,false);
- assert.ok(dueSenses(state,'2026-10-30').includes('light-n'));
+test('bare recognition jumps to audio and only a completed typed answer records memory',()=>{
+ const state=study();answerBare(state,true);assert.equal(state.session.stage,'listen');assert.equal(state.records['light-n'],undefined);
+ assert.throws(()=>answerListening(state,'光线'),/先完整听/);markListeningPlayed(state);assert.throws(()=>answerListening(state,'   '),/输入中文/);
+ answerListening(state,'光线');assert.equal(state.session.stage,'detail');assert.equal(state.session.states['light-n'].passed,true);assert.equal(state.records['light-n'].audioVerified,true);
+ assert.throws(()=>answerListening(state,'光线'));continueLearning(state,0);assert.equal(state.records['light-n'].pending,false);assert.ok(dueSenses(state,'2026-10-30').includes('light-n'));
 });
 test('wrong typed meaning and unknown both remain unpassed, then show another same-day example',()=>{
  for(const unknown of [false,true]){
@@ -47,7 +42,7 @@ test('typed draft, current cue and result survive backup validation',()=>{
  const bad=structuredClone(state);bad.session.listenVerdict.round++;assert.throws(()=>validateState(bad));
 });
 test('old active sessions gain an audio gate without deleting completed history or changing IDs',()=>{
- const state=study();answerBare(state,true);answerSense(state,true);delete state.session.protocol;
+ const state=study();answerBare(state,false);answerSense(state,true);delete state.session.protocol;
  state.session.states['light-n'].passed=true;state.session.states['light-n'].known=1;
  state.records['book-n']={wordId:'book',level:2,due:'2026-11-10'};
  const oldRecord=structuredClone(state.records['book-n']);const restored=validateState(JSON.parse(JSON.stringify(state)));

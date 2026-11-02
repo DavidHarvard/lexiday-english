@@ -1,14 +1,15 @@
+import {getWord} from './personal-words.js';
 import {audioQuestion} from './engine.js';
 import {wordMap} from './data.js';
 import {wordEntries,spokenWord,examplesForSense} from './word-content.js';
-function taskExample(task){const word=wordMap[task?.wordId],sense=word?.senses.find(s=>s.id===task.senseId);if(!sense)return '';const examples=examplesForSense(word,sense);return examples[(task.round-1)%examples.length]?.en||'';}
+function taskExample(state,task){const word=getWord(state,task?.wordId),sense=word?.senses.find(s=>s.id===task.senseId);if(!sense)return '';const examples=examplesForSense(word,sense);return examples[(task.round-1)%examples.length]?.en||'';}
 function allAudio(word){if(!word)return [];return [spokenWord(word),audioQuestion(word),...wordEntries(word).flatMap(entry=>(entry.examples||[]).map(ex=>ex.en)),...word.senses.flatMap(s=>(s.examples||[]).map(ex=>ex.en))];}
 export function learningAudioLookahead(state){
  const q=state.session,current=q?.current;if(!current||q.stage==='done')return [];
  // Mirror next()'s rotation without changing the queue or any learning progress.
  const waiting=q.queue.filter(t=>!q.states[t.senseId]?.passed&&!state.knownWords?.[t.wordId]);
  const next=waiting.find(t=>t.wordId!==current.wordId)||waiting[0];
- const word=wordMap[current.wordId],nextWord=wordMap[next?.wordId];
+ const word=getWord(state,current.wordId),nextWord=getWord(state,next?.wordId);
  // Current context first, then the next word and every one of its examples.
- return [...new Set([spokenWord(word),taskExample(current),audioQuestion(word),nextWord&&spokenWord(nextWord),taskExample(next),nextWord&&audioQuestion(nextWord),...allAudio(nextWord),...allAudio(word)].filter(Boolean))];
+ return [...new Set([spokenWord(word),taskExample(state,current),audioQuestion(word),nextWord&&spokenWord(nextWord),taskExample(state,next),nextWord&&audioQuestion(nextWord),...allAudio(nextWord),...allAudio(word)].filter(Boolean))];
 }

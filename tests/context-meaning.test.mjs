@@ -9,7 +9,7 @@ import worker from '../server/worker.js';
 import {database} from '../server/local-db.mjs';
 const DAY='2026-11-01';
 function learning(){const s=initial();s.plan.count=1;begin(s,DAY);return s;}
-function listening(){const s=learning();answerBare(s,true);answerSense(s,true);continueLearning(s,0);return s;}
+function listening(){const s=learning();answerBare(s,true);return s;}
 const furnished={wordId:'furnished',senseId:'furnished-adj-1',round:1,input:'房子里面已经提供了家具'};
 
 test('Chinese paraphrases accept equivalent furniture descriptions and distinguish deposit meanings',()=>{
@@ -58,7 +58,7 @@ test('semantic results cannot bypass complete audio or apply to another task, ro
 
 test('giving up at any learning prompt opens meaning details without passing and retains another round',()=>{
  for(const stage of ['bare','sentence','listen']){
-  let s=stage==='listen'?listening():learning();if(stage==='sentence')answerBare(s,true);
+  let s=stage==='listen'?listening():learning();if(stage==='sentence')answerBare(s,false);
   const task={...s.session.current},first=activeExample(s).en;giveUpMemory(s);
   assert.equal(s.session.stage,'detail');assert.equal(s.session.gaveUp,true);assert.equal(s.session.states[task.senseId].passed,false);assert.equal(s.session.states[task.senseId].known,0);
   s=validateState(structuredClone(s));continueLearning(s,0);
@@ -68,10 +68,10 @@ test('giving up at any learning prompt opens meaning details without passing and
  }
 });
 
-test('giving up a due review records failure and schedules tomorrow, never permanent exclusion',()=>{
+test('giving up a due review records failure and returns to the same-day queue, never permanent exclusion',()=>{
  const s=initial();s.plan.count=1;s.records['bright-adj']={wordId:'bright',level:2,interval:8,due:DAY,audioVerified:true};begin(s,DAY);giveUpMemory(s);
  assert.equal(s.session.stage,'detail');assert.equal(s.session.reviewGrade,0);continueLearning(s,0);
- assert.equal(s.records['bright-adj'].due,'2026-11-02');assert.equal(s.records['bright-adj'].pending,true);assert.equal(s.knownWords.bright,undefined);assert.equal(dayLog(s,DAY).passed.includes('bright-adj'),false);
+ assert.equal(s.records['bright-adj'].due,DAY);assert.equal(s.records['bright-adj'].pending,true);assert.equal(s.knownWords.bright,undefined);assert.equal(dayLog(s,DAY).passed.includes('bright-adj'),false);
 });
 
 test('legacy active prompts require sentence playback while completed records remain unchanged',()=>{

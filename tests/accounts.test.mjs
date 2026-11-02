@@ -14,7 +14,7 @@ test('all three learning modules persist with independent revisions; corrupt pay
 test('typed audio draft and result resume across authenticated clients without losing old records',async()=>{
  const s=setup(),a=s.client(),b=s.client();await a.call('register','POST',{username:'audio_learner',password});
  let data=initial();data.plan.count=1;data.records['book-n']={wordId:'book',level:2,due:'2027-01-01'};
- begin(data,'2026-10-29');answerBare(data,true);answerSense(data,true);continueLearning(data);setMeaningDraft(data,'光线');
+ begin(data,'2026-10-29');answerBare(data,true);setMeaningDraft(data,'光线');
  assert.equal((await a.call('progress/words','PUT',{revision:0,data})).status,200);
  await b.call('login','POST',{username:'audio_learner',password});data=validateState((await b.call('session')).body.progress.words.data);
  assert.equal(data.session.stage,'listen');assert.equal(data.session.listenDraft,'光线');assert.equal(data.records['book-n'].level,2);
