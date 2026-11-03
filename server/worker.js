@@ -3,6 +3,7 @@ import {prepareMeaningRequest,judgeMeaning,meaningResult,MEANING_VERSION} from '
 import {prepareSpeechRequest,generateSpeech,SPEECH_VERSION} from './speech.js';
 import {validateState} from '../dist/engine.js';
 import {validateGrammar} from '../dist/grammar-model.js';
+import {preserveBookHistory,refreshBookResults} from '../dist/grammar-reader-model.js';
 import {validateIelts} from '../dist/ielts-model.js';
 import {prepareReadingRequest,generateReading,READING_GENERATOR_VERSION,READING_DAILY_LIMIT} from './reading.js';
 const validators={words:validateState,grammar:validateGrammar,ielts:validateIelts};
@@ -137,6 +138,11 @@ export default {async fetch(request,env,ctx){
    await limit(env.DB,'sync:'+user.id,300,60);const b=await body(request);
    if(!Number.isSafeInteger(b.revision)||b.revision<0)throw new HttpError(400,'版本号无效。');
    try{validators[module](b.data);}catch{throw new HttpError(400,'学习数据校验失败，云端原记录未改变。');}
+   if(module==='grammar'){
+    const previous=await env.DB.prepare('SELECT data,revision FROM progress WHERE user_id=? AND module=?').bind(user.id,module).first();
+    if(previous&&previous.revision!==b.revision)return json({error:'另一台设备已更新进度，请先选择要保留的版本。',conflict:true},409);
+    if(previous){b.data=preserveBookHistory(b.data,refreshBookResults(JSON.parse(previous.data)));try{validateGrammar(b.data);}catch{throw new HttpError(400,'语法记录合并失败，云端原记录未改变。');}}
+   }
    const serialized=JSON.stringify(b.data),stamp=now();if(enc.encode(serialized).length>1800000)throw new HttpError(413,'此模块数据超过 1.8 MB，请先导出备份并整理历史记录。');let result;
    if(b.revision===0)result=await env.DB.prepare('INSERT OR IGNORE INTO progress(user_id,module,data,revision,updated_at) VALUES (?,?,?,1,?)').bind(user.id,module,serialized,stamp).run();
    else result=await env.DB.prepare('UPDATE progress SET data=?,revision=revision+1,updated_at=? WHERE user_id=? AND module=? AND revision=?').bind(serialized,stamp,user.id,module,b.revision).run();
