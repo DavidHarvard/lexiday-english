@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {initialGrammar,validateGrammar} from '../dist/grammar-model.js';
-import {bookState,writeBookAnswer,submitBookAnswer,bookMistakes,refreshBookResults,grammarItemMap} from '../dist/grammar-reader-model.js';
+import {bookState,writeBookAnswer,submitBookAnswer,bookMistakes,refreshBookResults,grammarItemMap,preserveBookHistory} from '../dist/grammar-reader-model.js';
 import worker from '../server/worker.js';
 import {database} from '../server/local-db.mjs';
 const id='1.1:2',answer=grammarItemMap[id].answer;
@@ -12,6 +12,7 @@ test('every check freezes the submitted text and result, while later drafts and 
  const record=validateGrammar(structuredClone(state)).pdfBook.exercises[id];assert.equal(record.draft,answer);assert.equal(record.result,'correct');assert.equal(record.attempts.length,3);assert.deepEqual(record.attempts[0],first);assert.equal(bookMistakes(record).length,1);assert.notEqual(record.attempts[1].id,record.attempts[2].id);
  const bad=structuredClone(state);bad.pdfBook.exercises[id].attempts[0].at='not a date';assert.throws(()=>validateGrammar(bad));
  const duplicate=structuredClone(state);duplicate.pdfBook.exercises[id].attempts.push({...first});assert.throws(()=>validateGrammar(duplicate));
+ const older=structuredClone(state);delete older.pdfBook.exercises[id].attempts;preserveBookHistory(older,state);assert.equal(older.pdfBook.exercises[id].attempts.length,3,'an old autosave must not invent another check for the same answer');
 });
 test('legacy results are preserved with an unknown timestamp, including results changed by a later key correction',()=>{
  const state=initialGrammar();bookState(state).exercises[id]={draft:answer,result:'incorrect',selfChecked:false};refreshBookResults(state);const r=state.pdfBook.exercises[id];assert.equal(r.result,'correct');assert.equal(r.attempts[0].result,'incorrect');assert.equal(r.attempts[0].at,null);assert.equal(r.attempts[0].source,'legacy');refreshBookResults(state);assert.equal(r.attempts.length,1);validateGrammar(state);

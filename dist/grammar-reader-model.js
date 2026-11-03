@@ -47,6 +47,7 @@ export function preserveBookHistory(incoming,stored){
  for(const[id,old]of Object.entries(previous)){
   if(!grammarItemMap[id])continue;keepLegacyCheck(id,old);if(!old.attempts.length)continue;
   const current=records[id];if(!current){records[id]=structuredClone(old);continue;}
+  if(!Array.isArray(current.attempts)&&old.attempts.some(a=>a.answer===current.draft&&a.result===current.result))current.attempts=[];
   keepLegacyCheck(id,current);const seen=new Set(old.attempts.map(a=>a.id));current.attempts=[...structuredClone(old.attempts),...current.attempts.filter(a=>!seen.has(a.id))];
  }
  return incoming;
