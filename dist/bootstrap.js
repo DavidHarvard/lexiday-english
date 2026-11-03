@@ -3,3 +3,5 @@ import {mountAccountUI} from './account-ui.js';
 await initAccount();
 await import('./app.js');
 mountAccountUI();
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});

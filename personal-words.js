@@ -6,7 +6,7 @@ const plain=(s,max)=>typeof s==='string'&&s.trim().length>0&&s.length<=max&&!/[<
 export function validateCustomWord(word){
  if(!word||!/^reading:[a-z]+(?:[-' ][a-z]+)*$/.test(word.id)||word.id.length>108||word.word!==word.id.slice(8)||!Array.isArray(word.senses)||word.senses.length<1||word.senses.length>6)throw Error('阅读词条无效。');
  if(!Array.isArray(word.notes)||word.notes.length)throw Error('阅读词条关联无效。');
- for(const [i,s] of word.senses.entries())if(s.id!==word.id+':'+(i+1)||!plain(s.pos,30)||!plain(s.meaning,180)||!/[\u3400-\u9fff]/.test(s.meaning)||!Array.isArray(s.examples)||s.examples.length<2||s.examples.length>4||s.examples.some(ex=>!plain(ex.en,380)||!plain(ex.zh,400)))throw Error('阅读词义或例句无效。');
+ for(const [i,s] of word.senses.entries())if(s.id!==word.id+':'+(i+1)||!plain(s.pos,30)||!plain(s.meaning,180)||!/[\u3400-\u9fff]/.test(s.meaning)||!Array.isArray(s.examples)||s.examples.length<(word.source==='dictionary'?1:2)||s.examples.length>4||s.examples.some(ex=>!plain(ex.en,word.source==='dictionary'?5000:380)||!plain(ex.zh,word.source==='dictionary'?5000:400)))throw Error('阅读词义或例句无效。');
  return word;
 }
 export function validatePersonalData(state){

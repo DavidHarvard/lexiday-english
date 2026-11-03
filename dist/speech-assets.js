@@ -1,0 +1,28 @@
+// Original teaching material, recorded with Microsoft Zira (en-US).
+export const speechAssets={
+  "On Tuesday afternoon, Maya joined a small English listening group at the community library. The group had planned to use a recording, but the loudspeaker was not working. Instead of cancelling the lesson, the tutor read a short example aloud: \"": "/audio/listening/cbe9a529ee3a1be98e93.wav",
+  "\" Maya wrote the sentence in a notebook and underlined the key expression. At first, some people offered different meanings. The tutor asked them to use the whole sentence as a clue. After they discussed their ideas in pairs, everyone explained an answer without looking at a dictionary. Before leaving, Maya recorded the example on a phone so that it could be played again on the": "/audio/listening/0307c8227f75156728f2.wav",
+  "bus home. The group agreed to meet in the same place the following week.": "/audio/listening/138a3b099a1ffc8d042f.wav",
+  "Why did the tutor read the example aloud?": "/audio/listening/259b93b953307e9164ed.wav",
+  "Why did Maya record the example on a phone?": "/audio/listening/23688292d5f682a15924.wav",
+  "Daniel volunteered at a local history museum on Friday. He was helping to prepare a new audio guide for visitors. One recording contained this sentence: \"": "/audio/listening/148cbdf8a0b7d149a7dd.wav",
+  "\" Before the guide could be published, a colleague needed to check whether every sentence was clear. Daniel's headphones stopped working halfway through the recording. He went to the reception desk and borrowed a spare pair from the receptionist. With the new headphones, he could hear the entire recording clearly. He marked two places where the speaker needed to slow down. At": "/audio/listening/1c42d2df69c023a1b8d1.wav",
+  "the end of the afternoon, he printed a short checklist for his colleague. The museum planned to test the guide with a small group of visitors the following Monday.": "/audio/listening/b666e8768a02ae515f12.wav",
+  "Where did Daniel borrow the spare headphones?": "/audio/listening/8b53dd54f49c9c05f1a5.wav",
+  "On which day would visitors test the audio guide?": "/audio/listening/6090a7efab36de6112c8.wav",
+  "Sofia was preparing a short newsletter for her neighbourhood on Monday evening. An older neighbour had sent her a paragraph in English, including the line: \"": "/audio/listening/baa987790721311df7ff.wav",
+  "\" Sofia understood most of it, but she wanted to check the meaning of the important words before translating it. She read the whole paragraph twice and then discussed it with the newsletter editor. They agreed on a clear translation and saved both versions in the shared folder. The editor asked Sofia to finish the layout by one o'clock on Friday. She also needed to print": "/audio/listening/2646e53ce746f54ba42d.wav",
+  "fifteen copies for people who did not use email. Sofia wrote both tasks on a note beside her computer so she would not forget them during the busy week.": "/audio/listening/ad16413ca2717f50e442.wav",
+  "When was the newsletter layout due?": "/audio/listening/82302a3ee8b6b056f64b.wav",
+  "How many copies did Sofia need to print?": "/audio/listening/4c6d5ec600a5c2e70436.wav",
+  "Leo and Aisha were rehearsing a short play for their school festival. Their rehearsal was meant to take place in the courtyard, but heavy rain forced them to move into room B7. Aisha had a line that she found difficult to say naturally: \"": "/audio/listening/f73e81a594590b49fce3.wav",
+  "\" Leo read the lines before and after it so that she could understand the situation. They repeated the scene slowly and then tried it at a normal speaking speed. The rehearsal began at six and finished at seven. Before they left, Aisha recorded the final version on her phone. Their drama teacher, Mrs Green, had agreed to listen to the recording the next morning and send them": "/audio/listening/c0f8765836179d47f4f9.wav",
+  "suggestions before the festival.": "/audio/listening/bc7bbbc3ad6d2f1ae3b1.wav",
+  "Where did they finally rehearse?": "/audio/listening/cf862adaa6640fb5c3dd.wav",
+  "Who would listen to the recording the next morning?": "/audio/listening/e3402a51eeef17dfeb20.wav",
+  "Anna arrived at the community radio station early on Wednesday to help with a programme for English learners. The producer had selected a short sentence from an interview: \"": "/audio/listening/14b0e9662a4d80ee8635.wav",
+  "\" Anna practised reading the sentence clearly while the technician checked the sound. During their first attempt, the background music was too loud, so the technician lowered it. They made a second recording and listened carefully to the result. This time every word could be heard. The complete practice recording lasted forty seconds. Anna saved it on the studio computer and": "/audio/listening/ab789645d9be0bdc20ed.wav",
+  "sent a copy to the producer by email. The producer would choose the final clips that afternoon, before the programme was broadcast on Thursday morning.": "/audio/listening/d0312027fd7526abcf0c.wav",
+  "What did the technician do to the background music?": "/audio/listening/dc20c35122e4f6469ef0.wav",
+  "How long was the complete practice recording?": "/audio/listening/b51a9235ff8f905a8a7d.wav"
+};

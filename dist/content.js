@@ -10,5 +10,5 @@ export function createArticle(ids,learnedSenseIds=[],customWords={}){
 }
 export function shuffle(a,random=Math.random){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
 export function makeQuiz(state,log,onlyWrong=false){
- const targets=practiceTargets(state,log.touched,log.passed);const pack=log.practicePack?.passages.some(p=>log.passed.includes(p.senseId)&&!state.knownWords?.[p.wordId])?log.practicePack:fallbackPractice(state,targets);return quizFromPractice(pack,state,log,onlyWrong);
+ const targets=practiceTargets(state,log.touched,log.passed);const pack=log.practicePack?.version===3&&log.practicePack?.passages.some(p=>log.passed.includes(p.senseId)&&!state.knownWords?.[p.wordId])?log.practicePack:fallbackPractice(state,targets);return quizFromPractice(pack,state,log,onlyWrong);
 }

@@ -1,3 +1,4 @@
+import {recordedAsset} from './speech-storage.js';
 import {speechAudioCache} from './speech-cache.js';
 // Word, sentence and quiz playback share one cancellable queue. Local English
 // voices are preferred; missing/broken engines fall back to same-origin audio.
@@ -10,7 +11,7 @@ export function createSpeechController({getSynthesis=()=>globalThis.speechSynthe
  function clearWatch(){if(timer!==null)clearTimer(timer);timer=null;}
  function clearMedia(){if(audio){audio.onended=audio.onerror=audio.onplaying=audio.ontimeupdate=null;audio.pause();audio.removeAttribute?.('src');audio.load?.();audio=null;}if(objectUrl){revokeAudioUrl(objectUrl);objectUrl=null;}}
  function stop(){generation++;active=null;clearWatch();voiceCleanup?.();voiceCleanup=null;request?.abort();request=null;clearMedia();try{getSynthesis()?.cancel();}catch{}}
- function play(texts,onEnd){
+ function play(texts,onEnd,{preferRecorded=false}={}){
   stop();const token=generation,synthesis=getSynthesis();let queue;
   try{queue=(Array.isArray(texts)?texts:[texts]).filter(Boolean).flatMap(text=>speechChunks(text));}catch{onError('unavailable');return false;}
   if(!queue.length){onError('unavailable');return false;}
@@ -21,7 +22,7 @@ export function createSpeechController({getSynthesis=()=>globalThis.speechSynthe
   async function media(text){
    if(!current())return;clearWatch();active=null;
    if(!loadAudio){fail('unavailable');return;}
-   preferAudio=true;prefetchAudio(prefetchTexts);request=new AbortController();const pending=request;
+   preferAudio=true;prefetchAudio([...queue,...prefetchTexts]);request=new AbortController();const pending=request;
    watch(()=>fail('audio-timeout'),30000);
    try{const blob=await loadAudio(text,pending.signal);if(!current()||pending.signal.aborted)return;request=null;clearWatch();objectUrl=createAudioUrl(blob);const player=makeAudio();audio=player;player.preload='auto';player.volume=1;player.muted=false;player.playbackRate=.95;player.src=objectUrl;let started=false;
     player.onplaying=()=>{if(current()&&audio===player){started=true;watch(()=>fail('audio-timeout'),30000);}};
@@ -46,8 +47,8 @@ export function createSpeechController({getSynthesis=()=>globalThis.speechSynthe
    // Remote browser voices can silently fail behind a firewall. The server
    // route also covers devices with only Chinese voices, without OS changes.
    const voice=english.find(v=>v.localService===true)||english.find(v=>v.localService===undefined);
-   if(voice&&!preferAudio){native(text,voice);return;}
-   if(!voices.length&&synthesis?.addEventListener&&!waited&&!preferAudio){
+   if(voice&&!preferAudio&&!preferRecorded&&!recordedAsset(text)){native(text,voice);return;}
+   if(!voices.length&&synthesis?.addEventListener&&!waited&&!preferAudio&&!preferRecorded&&!recordedAsset(text)){
     const ready=()=>{if(!current())return;clearWatch();voiceCleanup?.();voiceCleanup=null;choose(text,true);};
     synthesis.addEventListener('voiceschanged',ready);voiceCleanup=()=>synthesis.removeEventListener('voiceschanged',ready);watch(ready,700);return;
    }
@@ -55,10 +56,10 @@ export function createSpeechController({getSynthesis=()=>globalThis.speechSynthe
   }
   next();return true;
  }
- function preload(texts){
+ function preload(texts,{recorded=false}={}){
   prefetchTexts=[...new Set(texts.filter(Boolean).flatMap(text=>speechChunks(text)))];
   const synthesis=getSynthesis(),voices=synthesis?.getVoices?.()||[],local=voices.some(v=>/^en(?:[-_]|$)/i.test(v.lang||'')&&v.localService!==false);
-  prefetchAudio(!prefetchTexts.length||local&&!preferAudio?[]:preferAudio||!synthesis||voices.length?prefetchTexts:[]);
+  prefetchAudio(recorded?prefetchTexts:!prefetchTexts.length||local&&!preferAudio?[]:preferAudio||!synthesis||voices.length?prefetchTexts:[]);
  }
  return {play,stop,preload};
 }

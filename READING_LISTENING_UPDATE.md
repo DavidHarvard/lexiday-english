@@ -1,0 +1,21 @@
+# Reading vocabulary and grouped listening — 2026-11-03
+
+The daily reader now queries a shared dictionary independently of the selected course. The 10,000 most frequent entries load first; 399,200 total entries are split across 700 small files and loaded as needed. ECDICT's Chinese definitions, pronunciation, English definitions and inflection links are retained. The source and MIT license are included in `dist/dictionary/`. Dictionary lookups and previously downloaded audio survive reloads in Cache Storage.
+
+New generated articles are checked word by word (including the title) before replacing the authored fallback. Articles with unresolved tokens keep the checked fallback. Existing saved articles are also checked on opening and replaced with a checked fallback if necessary. Every token in every authored fallback is covered. Double-click collection still schedules the selected word for tomorrow and uses the actual bilingual paragraph as its context example. The general dictionary stays separate from the learner's personal progress and chosen course.
+
+Listening version 3 groups two comprehension questions and one vocabulary question on one page. Options are English. Initially the material and English questions play with choices hidden. “直接答题” reveals choices immediately; playback errors also reveal them. Neither selection nor submission depends on successful audio playback. Each question has a separate English audio button. The three choices are saved as drafts and submitted together, then the original text appears and is read again. Earlier submitted quiz records remain in history; an unfinished older-format quiz is archived before starting the new format.
+
+Twenty-five original fixed passage/question clips (about 12 MB of PCM WAV) are published with the site. The variable example and target-word question are prepared during vocabulary study. Playback downloads the following chunks while the current chunk plays, and quiz look-ahead includes the following passage. Audio has a bounded 120-clip persistent cache as well as the existing bounded memory cache. The application shell is cached by a versioned service worker; account API responses are never cached by that worker. First use needs a network connection. Already downloaded clips can play offline; uncached clips or browser autoplay restrictions leave answer submission available.
+
+“再学单词” starts another batch using the current daily quantity, capped at 100, without changing the daily plan or clearing earlier results, notes or review dates. If the course is exhausted, the page says so.
+
+## Rebuilding
+
+- Normal build: `npm run build` (includes the offline shell).
+- Dictionary: download `ecdict.csv` and `LICENSE` from https://github.com/skywind3000/ECDICT into `outputs/reading-dictionary/`, then run `python scripts/build-reading-dictionary.py`. The source SHA-256 is recorded in `dist/dictionary/manifest.json`. The optional `articles.json` input enables the builder's fallback audit; the automated dictionary test always audits the committed reading library.
+- Fixed audio: run `node scripts/prepare-listening-audio.mjs`, then `scripts/record-listening-audio.ps1` on Windows with Microsoft Zira Desktop. The recorder skips existing files; unchanged clips keep stable content-derived filenames. Run the normal build afterward.
+
+## Validation
+
+168 automated checks pass, including full fallback dictionary coverage, inflected forms, next-day collected-word restoration, English grouped quiz submission without playback, static WAV data and an additional learning batch. Browser checks cover automatic choice reveal after playback, immediate answering, replay, errors, draft restoration, mobile layout, real double-click collection, study/audio regressions and an offline page reload with persistent dictionary/audio. A 600 ms simulated network delay test starts an already-prefetched next-word clip in 36 ms (mock playback, not an end-to-end production latency guarantee).

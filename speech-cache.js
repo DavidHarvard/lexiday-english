@@ -1,6 +1,7 @@
+import {speechStorage} from './speech-storage.js';
 // One shared cache for playback and silent look-ahead. A foreground consumer
 // joins an existing download, so clicking a prefetched word never requests it twice.
-export function createSpeechAudioCache({fetcher=(...args)=>fetch(...args),maxEntries=64,maxBytes=16*1024*1024,timeoutMs=30000}={}){
+export function createSpeechAudioCache({fetcher=(...args)=>fetch(...args),maxEntries=64,maxBytes=16*1024*1024,timeoutMs=30000,storage=speechStorage}={}){
  const cache=new Map(),jobs=new Map();let bytes=0,targets=[],scheduled=false,backgroundPauseUntil=0;
  const aborted=()=>new DOMException('Audio request canceled','AbortError');
  function cached(text){const value=cache.get(text);if(value){cache.delete(text);cache.set(text,value);}return value;}
@@ -11,11 +12,13 @@ export function createSpeechAudioCache({fetcher=(...args)=>fetch(...args),maxEnt
  function settle(job,error,blob){for(const consumer of job.consumers){consumer.cleanup();if(error)consumer.reject(error);else consumer.resolve(blob);}job.consumers.clear();}
  async function start(job){
   job.running=true;job.controller=new AbortController();const timer=setTimeout(()=>job.controller.abort(),timeoutMs);timer.unref?.();
-  try{const response=await fetcher('/api/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:job.text}),signal:job.controller.signal});
-   if(!response.ok||!response.headers.get('Content-Type')?.startsWith('audio/'))throw Error('audio-unavailable');
-   const blob=await response.blob();if(blob.size<100)throw Error('audio-unavailable');
+  try{let blob;try{blob=await storage?.get(job.text,job.controller.signal);}catch(error){if(job.controller.signal.aborted)throw error;}
+   if(!blob){const response=await fetcher('/api/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:job.text}),signal:job.controller.signal});
+    if(!response.ok||!response.headers.get('Content-Type')?.startsWith('audio/'))throw Error('audio-unavailable');
+    blob=await response.blob();if(blob.size<100)throw Error('audio-unavailable');await storage?.put(job.text,blob);
+   }
    if(jobs.get(job.text)!==job)return;remember(job.text,blob);settle(job,null,blob);
-  }catch(error){if(jobs.get(job.text)!==job)return;if(job.background)backgroundPauseUntil=Date.now()+30000;settle(job,error);}
+  }catch(error){if(jobs.get(job.text)!==job)return;if(job.background){backgroundPauseUntil=Date.now()+30000;const retry=setTimeout(schedule,30000);retry.unref?.();}settle(job,error);}
   finally{clearTimeout(timer);if(jobs.get(job.text)===job)jobs.delete(job.text);schedule();}
  }
  function pump(){

@@ -15,7 +15,7 @@ export function plannedCount(state,day=localDay()){if(state.plan.mode!=='date')r
 export function projectedFinish(state,day=localDay()){const remaining=remainingWords(state),count=plannedCount(state,day),l=dayLog(state,day);const inProgress=l.newWords.filter(id=>remaining.includes(id)).length;const capacity=Math.max(0,count-l.newWords.length)+inProgress;return addDays(day,Math.max(0,Math.ceil((remaining.length-capacity)/count)));}
 export function dailyStats(state,day=localDay()){const l=dayLog(state,day);return {new:l.newWords.length,review:l.reviewWords.length,passed:l.passed.length,touched:l.touched.length,due:dueSenses(state,day).length};}
 function senseState(state,id){return {strong:!!(state.unknownSenses?.[id]||state.records[id]?.everUnknown||state.records[id]?.weak),known:0,passed:false,lastRound:0,requiresAudio:!state.records[id]?.audioVerified};}
-export function begin(state,day=localDay()){
+export function begin(state,day=localDay(),extraCount=0){
  if(state.plan.paused)throw new Error('计划已暂停，请先恢复计划。');
  if(state.session?.day===day&&state.session.stage!=='done')return state.session;
  const log=dayLog(state,day);const due=new Set(dueSenses(state,day));
@@ -24,7 +24,7 @@ export function begin(state,day=localDay()){
  const review=stateWords(state).filter(w=>w.senses.some(s=>due.has(s.id)));
  review.sort(()=>Math.random()-.5);
  for(const w of review){types[w.id]='review';for(const se of w.senses.filter(s=>due.has(s.id))){if(log.passed.includes(se.id))continue;states[se.id]=senseState(state,se.id);tasks.push({wordId:w.id,senseId:se.id,round:1});}}
- const allowance=Math.max(0,plannedCount(state,day)-log.newWords.length);
+ const allowance=extraCount>0?Math.min(100,Math.floor(extraCount)):Math.max(0,plannedCount(state,day)-log.newWords.length);
  const unfinished=log.newWords.filter(id=>!state.knownWords?.[id]&&getWord(state,id).senses.some(s=>!state.records[s.id]?.level||state.records[s.id]?.pending)&&!types[id]);
  const fresh=[...unfinished,...orderedNewWords(state).filter(id=>!log.newWords.includes(id)&&!types[id]).slice(0,allowance)];
  for(const id of fresh){types[id]='new';for(const se of getWord(state,id).senses.filter(s=>!state.records[s.id]?.level||state.records[s.id]?.pending)){states[se.id]=senseState(state,se.id);tasks.push({wordId:id,senseId:se.id,round:1});}}
