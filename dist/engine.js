@@ -1,4 +1,5 @@
 import {validatePractice} from './listening-practice.js';
+import {validateBookReading} from './book-reading-model.js';
 import {getWord,stateWords,validatePersonalData,validateCustomWord} from './personal-words.js';
 import {validateReadingArticle} from './reading-model.js';
 import {scheduleReview} from './review-schedule.js';
@@ -36,12 +37,15 @@ export function next(state,now=Date.now()){
  const q=state.session; q.gaveUp=false;q.fastTrack=false;q.snapshot=null;q.lastAnswer=null;q.reviewGrade=null;q.cuePlayed=false;q.listenPlayed=false;q.listenDraft='';q.listenVerdict=null;q.audioUnavailable=false;q.meaningFeedback='';
  q.queue=q.queue.filter(t=>!q.states[t.senseId].passed);
  if(!q.queue.length){q.stage='done';q.current=null;return;}
- let idx=q.queue.findIndex(t=>t.wordId!==q.lastWord);if(idx<0)idx=0;
+ // Failed words return after other words, with a real pause if no others remain.
+ const eligible=t=>!t.notBefore||t.notBefore<=now;
+ let idx=q.queue.findIndex(t=>t.wordId!==q.lastWord&&eligible(t));if(idx<0)idx=q.queue.findIndex(eligible);
+ if(idx<0)idx=q.queue.reduce((best,t,i)=>t.notBefore<q.queue[best].notBefore?i:best,0);
  const task=q.queue.splice(idx,1)[0];q.current=task;q.round=Math.max(q.round,task.round);
  const w=getWord(state,task.wordId);const log=dayLog(state,q.day);
  if(!log.touched.includes(w.id)){log.touched.push(w.id);if(!log.article?.targetWordIds?.includes(w.id))log.article=null;if(log.quiz){(log.quizHistory??=[]).push(log.quiz);log.quiz=null;}}
  const list=q.types[w.id]==='new'?log.newWords:log.reviewWords;if(!list.includes(w.id))list.push(w.id);
- if(q.lastWord===w.id){q.stage='rest';q.readyAt=now+8000;return;}
+ if(q.lastWord===w.id||task.notBefore>now){q.stage='rest';q.readyAt=Math.max(now+8000,task.notBefore||0);return;}
  setTestStage(q);
 }
 export function leaveRest(state,now=Date.now()){const q=state.session;if(q.stage!=='rest'||now<q.readyAt)return false;setTestStage(q);return true;}
@@ -63,13 +67,13 @@ export function continueLearning(state,now=Date.now()){
  }
  if(q.types[t.wordId]!=='review'&&q.stage!=='result'&&!q.gaveUp&&!q.listenVerdict)return false;
  if(q.types[t.wordId]==='review'){
-  if(!st.passed&&q.reviewGrade===1&&!st.needsSentence&&!q.gaveUp){q.stage='review';q.cue='context';q.cuePlayed=false;q.listenDraft='';q.reviewGrade=null;return true;}
   const old=state.records[t.senseId];
   if(st.passed){if(old?.scheduledDay!==q.day||old?.pending){const result=scheduleReview(old,q.reviewGrade);state.records[t.senseId]={...old,wordId:t.wordId,level:Math.min(6,(old?.level||0)+1),last:q.day,due:addDays(q.day,result.interval),weak:false,everUnknown:!!state.unknownSenses?.[t.senseId],pending:false,audioVerified:true,scheduledDay:q.day,...result};}
    const log=dayLog(state,q.day);(log.reviewResults??=[]).push({senseId:t.senseId,grade:q.reviewGrade,cue:q.cue,at:new Date(now).toISOString()});if(!log.passed.includes(t.senseId))log.passed.push(t.senseId);
-  }else{persistUnknown(state,t.wordId,t.senseId,q.day);q.queue.push({...t,round:t.round+1});}
+  }else{persistUnknown(state,t.wordId,t.senseId,q.day);q.queue.push({...t,round:t.round+1,notBefore:now+60000});}
  }else if(st.passed)saveNewPass(state,t);
- else q.queue.push({...t,round:t.round+1});
+ else q.queue.push({...t,round:t.round+1,notBefore:now+(q.lastAnswer===false||q.gaveUp?60000:0)});
+ if(!st.passed&&(q.lastAnswer===false||q.gaveUp||q.types[t.wordId]==='review'))for(const queued of q.queue)if(queued.wordId===t.wordId)queued.notBefore=Math.max(queued.notBefore||0,now+60000);
  q.lastWord=t.wordId;next(state,now);return true;
 }
 export function activeExample(state){const t=state.session.current,w=getWord(state,t.wordId),sense=w.senses.find(s=>s.id===t.senseId),examples=examplesForSense(w,sense);return examples[(t.round-1)%examples.length]||null;}
@@ -94,6 +98,7 @@ export function listeningUnavailable(state){const q=state.session;if(q?.stage===
 export function completedWords(state,day=localDay()){const log=dayLog(state,day);return log.touched.filter(id=>getWord(state,id).senses.every(s=>log.passed.includes(s.id)||(state.records[s.id]?.due>day&&!state.records[s.id]?.pending)));}
 export function quizMistake(state,senseId,day=localDay()){const r=state.records[senseId];if(r&&!state.knownWords?.[r.wordId]){r.due=day;r.interval=1;r.grade=0;r.weak=true;}}
 export function validateState(value){
+ validateBookReading(value?.bookReading);
  function safe(v){if(typeof v==='string'&&/[<>]/.test(v))throw new Error('备份包含无效文本。');if(v&&typeof v==='object')for(const [k,x]of Object.entries(v)){if(['__proto__','constructor','prototype'].includes(k))throw new Error('备份包含无效字段。');safe(x);}}safe(value);validatePersonalData(value);
  if(!value||value.version!==1||!courseMap[value.course]||!value.plan||!Number.isInteger(value.plan.count)||value.plan.count<1||value.plan.count>100||!['count','date'].includes(value.plan.mode)||!value.records||!value.days)throw new Error('备份格式不正确。');
  const all=new Set(stateWords(value).flatMap(w=>w.senses.map(s=>s.id)));

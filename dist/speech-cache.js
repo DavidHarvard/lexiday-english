@@ -14,7 +14,7 @@ export function createSpeechAudioCache({fetcher=(...args)=>fetch(...args),maxEnt
   job.running=true;job.controller=new AbortController();const timer=setTimeout(()=>job.controller.abort(),timeoutMs);timer.unref?.();
   try{let blob;try{blob=await storage?.get(job.text,job.controller.signal);}catch(error){if(job.controller.signal.aborted)throw error;}
    if(!blob){const response=await fetcher('/api/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:job.text}),signal:job.controller.signal});
-    if(!response.ok||!response.headers.get('Content-Type')?.startsWith('audio/'))throw Error('audio-unavailable');
+    if(!response.ok||!response.headers.get('Content-Type')?.startsWith('audio/')){const error=Error('音频暂未准备好，请重试。');error.status=response.status;throw error;}
     blob=await response.blob();if(blob.size<100)throw Error('audio-unavailable');await storage?.put(job.text,blob);
    }
    if(jobs.get(job.text)!==job)return;remember(job.text,blob);settle(job,null,blob);
@@ -51,6 +51,19 @@ export function createSpeechAudioCache({fetcher=(...args)=>fetch(...args),maxEnt
   for(const text of targets)if(!cache.has(text))jobFor(text).background=true;
   schedule();
  }
- return {load,prefetch,has:text=>cache.has(text)};
+ async function prepare(texts,{signal,onProgress=()=>{},retries=2}={}){
+  const plan=[...new Set(texts.filter(Boolean))],failed=[];let index=0,completed=0;
+  onProgress({completed,total:plan.length,failed:0});
+  await Promise.all(Array.from({length:2},async()=>{while(index<plan.length){if(signal?.aborted)throw aborted();const text=plan[index++];let error;
+   for(let attempt=0;attempt<=retries;attempt++){try{await load(text,signal);error=null;break;}catch(e){error=e;if(signal?.aborted||e.name==='AbortError'&&signal?.aborted)throw e;if(e.status===429)break;if(attempt<retries)await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));}}
+   if(error)failed.push(text);else completed++;onProgress({completed,total:plan.length,failed:failed.length});
+  }}));return {completed,total:plan.length,failed};
+ }
+ return {load,prefetch,prepare,has:text=>cache.has(text)};
 }
 export const speechAudioCache=createSpeechAudioCache();
+export async function loadReliableSpeech(text,signal){
+ for(let attempt=0;attempt<2;attempt++){try{return await speechAudioCache.load(text,signal);}catch(error){if(signal?.aborted||error.status===429||attempt===1)throw error;
+  await new Promise((resolve,reject)=>{const cancel=()=>{clearTimeout(timer);reject(new DOMException('Audio request canceled','AbortError'));},timer=setTimeout(()=>{signal?.removeEventListener('abort',cancel);resolve();},400);signal?.addEventListener('abort',cancel,{once:true});});
+ }}
+}

@@ -1,18 +1,20 @@
 import {wordMap,words} from './data.js';
 import {wordForms} from './reading-model.js';
+import {repairKnownExamples} from './example-target.js';
 export const getWord=(state,id)=>Object.hasOwn(wordMap,id)?wordMap[id]:state?.customWords?.[id];
 export const stateWords=state=>[...words,...Object.values(state?.customWords||{})];
 const plain=(s,max)=>typeof s==='string'&&s.trim().length>0&&s.length<=max&&!/[<>]/.test(s);
 export function validateCustomWord(word){
  if(!word||!/^reading:[a-z]+(?:[-' ][a-z]+)*$/.test(word.id)||word.id.length>108||word.word!==word.id.slice(8)||!Array.isArray(word.senses)||word.senses.length<1||word.senses.length>6)throw Error('阅读词条无效。');
  if(!Array.isArray(word.notes)||word.notes.length)throw Error('阅读词条关联无效。');
- for(const [i,s] of word.senses.entries())if(s.id!==word.id+':'+(i+1)||!plain(s.pos,30)||!plain(s.meaning,180)||!/[\u3400-\u9fff]/.test(s.meaning)||!Array.isArray(s.examples)||s.examples.length<(word.source==='dictionary'?1:2)||s.examples.length>4||s.examples.some(ex=>!plain(ex.en,word.source==='dictionary'?5000:380)||!plain(ex.zh,word.source==='dictionary'?5000:400)))throw Error('阅读词义或例句无效。');
+ for(const [i,s] of word.senses.entries())if(s.id!==word.id+':'+(i+1)||!plain(s.pos,30)||!plain(s.meaning,180)||!/[\u3400-\u9fff]/.test(s.meaning)||!Array.isArray(s.examples)||s.examples.length<(word.source==='dictionary'?1:2)||s.examples.length>4||s.examples.some(ex=>!plain(ex.en,word.source==='dictionary'?5000:380)||!(word.source==='dictionary'&&ex.zh===''||plain(ex.zh,word.source==='dictionary'?5000:400))))throw Error('阅读词义或例句无效。');
  return word;
 }
 export function validatePersonalData(state){
  for(const key of ['customWords','wordNotes','readingWords'])if(state[key]!==undefined&&(!state[key]||typeof state[key]!=='object'||Array.isArray(state[key])))throw Error('个人单词数据无效。');
  if(Object.keys(state.customWords||{}).length>2000)throw Error('个人词库数量过多。');
  for(const [id,w] of Object.entries(state.customWords||{})){validateCustomWord(w);if(id!==w.id)throw Error('阅读词条 ID 不一致。');}
+ repairKnownExamples(state);
  let total=0;
  for(const [id,notes] of Object.entries(state.wordNotes||{})){
   if(!getWord(state,id)||!Array.isArray(notes)||notes.length>100||new Set(notes.map(n=>n.id)).size!==notes.length)throw Error('单词笔记格式无效。');

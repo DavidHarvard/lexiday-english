@@ -1,6 +1,7 @@
 import {dictionaryManifest} from './dictionary-manifest.js';
 import {lookupLocalWord,validateCustomWord} from './personal-words.js';
 import {splitDictionaryGloss} from './word-content.js';
+import {containsTarget} from './example-target.js';
 const normalize=text=>String(text).toLowerCase().replace(/[’‘]/g,"'").trim();
 export const articleTokens=article=>[...new Set(([article.title,...article.paragraphs.map(p=>p.en)].join(' ').match(/[A-Za-z]+(?:['’\-][A-Za-z]+)*/g)||[]).map(normalize))];
 const contractions={"i'm":'I am',"you're":'you are',"we're":'we are',"they're":'they are',"it's":'it is / it has',"that's":'that is',"there's":'there is',"he's":'he is / he has',"she's":'she is / she has',"don't":'do not',"doesn't":'does not',"didn't":'did not',"can't":'cannot',"couldn't":'could not',"won't":'will not',"wouldn't":'would not',"isn't":'is not',"aren't":'are not',"wasn't":'was not',"weren't":'were not',"haven't":'have not',"hasn't":'has not',"hadn't":'had not',"shouldn't":'should not',"let's":'let us',"i've":'I have',"we've":'we have',"they've":'they have',"you've":'you have',"i'll":'I will',"you'll":'you will',"we'll":'we will',"they'll":'they will',"i'd":'I would / I had',"you'd":'you would / you had'};
@@ -32,6 +33,7 @@ export function createReadingDictionary({fetcher=(...args)=>fetch(...args),stora
 export const readingDictionary=createReadingDictionary();
 export function dictionaryWord(entry,paragraph){
  const id='reading:'+entry.word,definitions=entry.record[2].split('\n').filter(Boolean);
- const senses=splitDictionaryGloss(entry.record[1]).slice(0,6).map((s,i)=>({id:id+':'+(i+1),pos:s.pos==='释义'?'词条':s.pos,meaning:s.meaning.slice(0,180),definition:(definitions[i]||definitions[0]||'').replace(/^[a-z]\.\s*/, '').slice(0,500),examples:[{en:paragraph.en,zh:paragraph.zh}],distractors:[]}));
+ const sentence=(paragraph.en.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[paragraph.en]).find(text=>containsTarget(text,entry.word))?.trim();if(!sentence)throw Error('本段中未找到该词的例句，请重新选择单词。');
+ const senses=splitDictionaryGloss(entry.record[1]).slice(0,6).map((s,i)=>({id:id+':'+(i+1),pos:s.pos==='释义'?'词条':s.pos,meaning:s.meaning.slice(0,180),definition:(definitions[i]||definitions[0]||'').replace(/^[a-z]\.\s*/, '').slice(0,500),examples:[{en:paragraph.zh?paragraph.en:sentence,zh:paragraph.zh||''}],distractors:[]}));
  return validateCustomWord({id,word:entry.word,ipa:entry.record[0],source:'dictionary',sourceUrl:dictionaryManifest.source,notes:[],senses});
 }

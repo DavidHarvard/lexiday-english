@@ -13,3 +13,8 @@ export function learningAudioLookahead(state){
  // Current context first, then the next word and every one of its examples.
  return [...new Set([spokenWord(word),taskExample(state,current),audioQuestion(word),nextWord&&spokenWord(nextWord),taskExample(state,next),nextWord&&audioQuestion(nextWord),...allAudio(nextWord),...allAudio(word)].filter(Boolean))];
 }
+export function learningSessionAudio(state){
+ const q=state.session;if(!q||q.stage==='done')return [];
+ const ids=[...new Set([q.current?.wordId,...q.queue.map(t=>t.wordId),...Object.keys(q.types)])].filter(id=>id&&!state.knownWords?.[id]);
+ return [...new Set([...learningAudioLookahead(state),...ids.flatMap(id=>allAudio(getWord(state,id)))])];
+}

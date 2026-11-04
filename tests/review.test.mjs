@@ -1,4 +1,5 @@
 import {answerReviewCorrect} from './word-learning-helpers.mjs';
+import {giveUpMemory,leaveRest} from '../dist/engine.js';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {words,wordMap,courseMap} from '../dist/data.js';
@@ -9,6 +10,7 @@ import {createArticle,makeQuiz} from '../dist/content.js';
 const DAY='2026-10-22',NEXT='2026-10-23';
 function due(id='bright'){const s=initial();s.plan.count=1;s.records[wordMap[id].senses[0].id]={wordId:id,level:2,due:DAY,last:'2026-10-21',interval:8,audioVerified:true};begin(s,DAY);assert.equal(s.session.current.wordId,id);return s;}
 function clone(s){return validateState(JSON.parse(JSON.stringify(s)));}
+function returnToBright(s){assert.ok(s.session.current.wordId!=='bright'||s.session.stage==='rest');let guard=12;while(s.session.current.wordId!=='bright'&&guard--){if(s.session.stage==='rest')leaveRest(s,1e15);giveUpMemory(s);continueLearning(s,61000);}assert.ok(guard>0);if(s.session.stage==='rest')leaveRest(s,1e15);}
 test('import keeps all 3610 unique entries and full phrases, without altering existing sense IDs',()=>{
  const report=JSON.parse(readFileSync('data/imports/ielts-import-report.json'));assert.equal(report.unparsed.length,0);assert.equal(report.unique,3610);assert.equal(report.duplicates.length,1);
  assert.equal(importedIds.length,3610);assert.equal(importedInfo.added,3451);assert.equal(words.length,3671);assert.equal(courseMap['ielts-basic'].words.length,3632);
@@ -33,7 +35,7 @@ test('unremembered new words survive exit before detail and become next-day revi
 test('context audio and sentence assistance, submitted state and grade survive refresh',()=>{
  for(const [cue,grade,declines] of [['context',4,0],['sentence',1,1]]){
  let s=due();assert.throws(()=>answerReview(s,true));assert.equal(reviewAudio(s),activeExample(s).en);for(let i=0;i<declines;i++){answerReview(s,false);s=clone(s);}
- assert.equal(s.session.cue,cue);if(cue==='context')assert.match(reviewAudio(s),/bright/i);if(['audio','context'].includes(cue))markReviewPlayed(s);answerReviewCorrect(s);assert.equal(s.session.stage,'detail');assert.equal(s.session.reviewGrade,grade);s=clone(s);continueLearning(s,0);if(grade===1){assert.equal(s.session.stage,'review');assert.equal(s.session.cue,'context');markReviewPlayed(s);answerReviewCorrect(s);continueLearning(s,0);}assert.equal(s.records['bright-adj'].grade,4);assert.ok(s.records['bright-adj'].due>DAY);clone(s);
+ assert.equal(s.session.cue,cue);if(cue==='context')assert.match(reviewAudio(s),/bright/i);if(['audio','context'].includes(cue))markReviewPlayed(s);answerReviewCorrect(s);assert.equal(s.session.stage,'detail');assert.equal(s.session.reviewGrade,grade);s=clone(s);continueLearning(s,0);if(grade===1){returnToBright(s);assert.equal(s.session.stage,'review');assert.equal(s.session.cue,'context');markReviewPlayed(s);answerReviewCorrect(s);continueLearning(s,61000);}assert.equal(s.records['bright-adj'].grade,4);assert.ok(s.records['bright-adj'].due>DAY);clone(s);
  }
 });
 test('failure at last cue stays unpassed and returns tomorrow; correcting a success produces the same schedule',()=>{
@@ -43,7 +45,7 @@ test('failure at last cue stays unpassed and returns tomorrow; correcting a succ
 test('text assistance cannot pass a word that has never been verified by audio input',()=>{
  const s=due();s.records['bright-adj'].audioVerified=false;s.session.states['bright-adj'].requiresAudio=true;
  useReviewText(s);answerReviewCorrect(s);assert.equal(s.session.reviewGrade,1);assert.equal(s.session.states['bright-adj'].passed,false);
- continueLearning(s,0);assert.equal(s.session.stage,'review');assert.equal(s.session.cue,'context');assert.equal(s.records['bright-adj'].audioVerified,false);
+ continueLearning(s,0);assert.equal(s.records['bright-adj'].audioVerified,false);returnToBright(s);assert.equal(s.session.stage,'review');assert.equal(s.session.cue,'context');
  const t=due();useReviewText(t);answerReviewCorrect(t);assert.equal(t.session.reviewGrade,1);assert.equal(t.session.audioUnavailable,true);
 });
 test('weights produce bounded increasing intervals without giving longer credit for more hints',()=>{

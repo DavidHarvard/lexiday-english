@@ -1,4 +1,4 @@
-import {prepareLookup,lookupWord} from './lookup.js';
+import {prepareLookup,lookupWord,prepareExampleRepair,repairWordExamples} from './lookup.js';
 import {prepareMeaningRequest,judgeMeaning,meaningResult,MEANING_VERSION} from './meaning.js';
 import {prepareSpeechRequest,generateSpeech,SPEECH_VERSION} from './speech.js';
 import {validateState} from '../dist/engine.js';
@@ -30,19 +30,19 @@ export default {async fetch(request,env,ctx){
  const url=new URL(request.url),path=url.pathname;
  if(!path.startsWith('/api/'))return env.ASSETS.fetch(request);
  try{
-  if(!env.DB||(!['/api/reading','/api/speech','/api/meaning-check','/api/word-lookup'].includes(path)&&(!env.AUTH_PEPPER||env.AUTH_PEPPER.length<32)))throw new HttpError(503,'账号服务尚未配置完成。访客学习仍可使用。');
+  if(!env.DB||(!['/api/reading','/api/speech','/api/meaning-check','/api/word-lookup','/api/word-examples'].includes(path)&&(!env.AUTH_PEPPER||env.AUTH_PEPPER.length<32)))throw new HttpError(503,'账号服务尚未配置完成。访客学习仍可使用。');
   if(path==='/api/health'&&request.method==='GET'){await env.DB.prepare('SELECT id FROM users LIMIT 1').first();return json({ok:true,version:'accounts-v1'});}
   if(!['GET','POST','PUT'].includes(request.method))throw new HttpError(405,'不支持此操作。');
   if(request.method!=='GET'&&request.headers.get('Origin')!==url.origin)throw new HttpError(403,'请求来源不正确，请刷新网站后重试。');
   const ip=request.headers.get('CF-Connecting-IP')||'local';
-  if(path==='/api/word-lookup'&&request.method==='POST'){
-   let prepared;try{prepared=prepareLookup(await body(request));}catch(error){throw new HttpError(400,error.message);}
+  if(['/api/word-lookup','/api/word-examples'].includes(path)&&request.method==='POST'){
+   const repairing=path==='/api/word-examples';let prepared;try{prepared=(repairing?prepareExampleRepair:prepareLookup)(await body(request));}catch(error){throw new HttpError(400,error.message);}
    if(prepared.local)return json({word:prepared.local});
-   const cache=globalThis.caches?.default,key=new Request(url.origin+path+'/cache-v3/'+await digest(JSON.stringify(prepared)));
+   const cache=globalThis.caches?.default,key=new Request(url.origin+path+'/cache-v4/'+await digest(JSON.stringify(prepared)));
    const cached=await cache?.match(key);if(cached)return json(await cached.json());
    if(!env.AI?.run)throw new HttpError(503,'词条查询暂不可用，请稍后再试。');
    await limit(env.DB,'lookup-ip:'+await digest(ip),200,86400);await limit(env.DB,'lookup-global',500,86400);
-   let result;try{result={word:await lookupWord(env.AI,prepared)};}catch(error){console.warn('Word lookup unavailable:',error.message);throw new HttpError(503,'暂时无法确认这个词的释义，请稍后重试。');}
+   let result;try{result=repairing?{examples:await repairWordExamples(env.AI,prepared)}:{word:await lookupWord(env.AI,prepared)};}catch(error){console.warn('Word lookup unavailable:',error.message);throw new HttpError(503,'暂时无法确认这个词的释义，请稍后重试。');}
    if(cache){const pending=cache.put(key,new Response(JSON.stringify(result),{headers:{'Content-Type':'application/json','Cache-Control':'public, max-age=604800'}}));if(ctx?.waitUntil)ctx.waitUntil(pending);else await pending;}
    return json(result);
   }
@@ -62,8 +62,10 @@ export default {async fetch(request,env,ctx){
    const signature=await digest(text),cache=globalThis.caches?.default,cacheKey=new Request(url.origin+'/api/speech-cache/'+SPEECH_VERSION+'/'+signature);
    const cached=await cache?.match(cacheKey);if(cached)return cached;
    if(!env.AI?.run)throw new HttpError(503,'英文音频服务暂不可用，请稍后重播。');
-   await limit(env.DB,'speech-ip:'+await digest(ip),600,86400);
-   await limit(env.DB,'speech-global',1000,86400);
+   // Whole-day preparation includes many short clips. Keep the character-cost
+   // ceiling, while allowing enough requests for a 100-word learning plan.
+   await limit(env.DB,'speech-ip:'+await digest(ip),2000,86400);
+   await limit(env.DB,'speech-global',2500,86400);
    const bucket=Math.floor(now()/86400),quota=await env.DB.prepare('INSERT INTO rate_limits(key,count,expires_at) VALUES (?,?,?) ON CONFLICT(key) DO UPDATE SET count=count+excluded.count RETURNING count').bind('speech-characters:'+bucket,text.length,now()+172800).first();
    if(quota.count>120000)throw new HttpError(429,'今日英文音频生成额度已用完，已缓存的音频仍可播放。');
    let generated;try{generated=await generateSpeech(env.AI,text);}catch(error){console.error('Speech generation failed:',error.message);throw new HttpError(503,'英文音频生成暂未完成，请点击重播。');}

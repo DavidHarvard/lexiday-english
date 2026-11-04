@@ -23,7 +23,7 @@ export function createSpeechController({getSynthesis=()=>globalThis.speechSynthe
    if(!current())return;clearWatch();active=null;
    if(!loadAudio){fail('unavailable');return;}
    preferAudio=true;prefetchAudio([...queue,...prefetchTexts]);request=new AbortController();const pending=request;
-   watch(()=>fail('audio-timeout'),30000);
+   watch(()=>fail('audio-timeout'),65000);
    try{const blob=await loadAudio(text,pending.signal);if(!current()||pending.signal.aborted)return;request=null;clearWatch();objectUrl=createAudioUrl(blob);const player=makeAudio();audio=player;player.preload='auto';player.volume=1;player.muted=false;player.playbackRate=.95;player.src=objectUrl;let started=false;
     player.onplaying=()=>{if(current()&&audio===player){started=true;watch(()=>fail('audio-timeout'),30000);}};
     player.ontimeupdate=()=>{if(current()&&audio===player&&started)watch(()=>fail('audio-timeout'),30000);};

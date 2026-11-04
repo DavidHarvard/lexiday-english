@@ -1,5 +1,15 @@
 # 词序 Lexiday
 
+## PDF 阅读、整日音频与延后复测（2026-11-05）
+
+今日阅读改为用户上传的 IELTS Reading：30 篇文章、400 道原题，从首次进入起每天开放一篇，保留以前开放的文章。支持选择、多选、填空、提交核对、历史提交和右侧笔记；图表可展开原题页查看。提交后双击查词会加入次日复习。新增 Harry Potter 趣味阅读，249 个正文页、17 章，查词只查看，不收进复习库；页码和段落位置随账号保存。两份原始 PDF 也提供查看入口。`scripts/build-reading-books.py` 从用户提供的本地 PDF 重建内容，答题记录保存在现有 words 账号数据中的 `bookReading`，无需迁移数据库。
+
+答错的单词在查看提示后排到其他词之后；只剩该词时至少间隔一分钟。开始学习先准备本轮全部新词、到期词及各词义例句，显示下载进度并自动重试临时失败；可选择边下载边学习。固定听力材料和 Play question 统一使用现有 Cloudflare Melo English 音色。已下载语音使用持久缓存；首次下载仍需要联网，浏览器限制自动播放时需点击一次播放。保留原有每日 120,000 字符生成额度，并提高短音频请求上限以支持整批预加载。
+
+例句新增目标词校验，允许正确的词形变化和短语变形；个人词条 `way` 的错误例句自动修正，其他缺词例句在学习前按原词义补正。已有学习记录、个人笔记和原生成文章历史保留。
+
+本次验证：`node --test tests/*.test.mjs`；`tests/browser-reading-books.mjs`；`tests/browser-recorded-listening.mjs`；`tests/browser-offline-recovery.mjs`。浏览器脚本可通过 `LEXIDAY_PLAYWRIGHT_MODULE`、`LEXIDAY_CHROME_PATH`、`LEXIDAY_TEST_URL` 配置环境。
+
 ## 通用阅读词典与听力整段作答（2026-11-03）
 
 阅读新增独立的 10,000 常用词核心词典及按需加载的完整词典，文章发布前检查全部英文单词的释义覆盖。听力每段三题同页，选项全部为英文；每题可单独播放英文提问，播放失败仍可提交。固定音频随网站发布，当天例句提前下载并缓存；已下载内容支持离线重播。完成今日计划后可继续“再学单词”。实现、来源、重建与验证见 [READING_LISTENING_UPDATE.md](READING_LISTENING_UPDATE.md)。
