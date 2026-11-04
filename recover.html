@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>恢复访问 · 词序 Lexiday</title><style>body{background:#f5f6fb;color:#172344;font:16px/1.7 system-ui,sans-serif;margin:0}main{max-width:540px;background:white;border:1px solid #e2e6f0;border-radius:20px;padding:32px;margin:12vh auto}h1{font-size:28px}a,button{display:inline-block;border:0;border-radius:10px;background:#414cda;color:white;padding:12px 20px;text-decoration:none;font:inherit;cursor:pointer}p{color:#59647e}.fine{font-size:14px}@media(max-width:600px){main{margin:8vh 18px;padding:24px}}</style></head><body><main><h1>恢复网站访问</h1><p id="status" role="status">正在修复页面打开方式…</p><p class="fine">学习记录、个人笔记和已下载音频都会保留。</p><a id="return" href="/?recovered=1#learn">返回单词学习</a><p id="help" class="fine"></p></main><script>
+(async()=>{
+ const status=document.getElementById('status'),help=document.getElementById('help');
+ try{
+  if('serviceWorker' in navigator){const registrations=await navigator.serviceWorker.getRegistrations();for(const registration of registrations){const workers=[registration.active,registration.waiting,registration.installing].filter(Boolean);if(workers.some(worker=>{const url=new URL(worker.scriptURL);return url.origin===location.origin&&url.pathname==='/sw.js';}))await registration.unregister();}}
+  status.textContent='恢复已完成，请点击下方按钮重新打开。';
+ }catch{status.textContent='自动恢复暂未完成。';help.textContent='请按 Ctrl + Shift + R 强制刷新，然后点击“返回单词学习”。';}
+ document.getElementById('return').href='/?recovered='+Date.now()+'#learn';
+})();
+</script></body></html>
