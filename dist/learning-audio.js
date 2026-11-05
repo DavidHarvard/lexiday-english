@@ -2,7 +2,7 @@ import {getWord} from './personal-words.js';
 import {audioQuestion} from './engine.js';
 import {wordMap} from './data.js';
 import {wordEntries,spokenWord,examplesForSense} from './word-content.js';
-function taskExample(state,task){const word=getWord(state,task?.wordId),sense=word?.senses.find(s=>s.id===task.senseId);if(!sense)return '';const examples=examplesForSense(word,sense);return examples[(task.round-1)%examples.length]?.en||'';}
+function taskExample(state,task){const word=getWord(state,task?.wordId),sense=word?.senses.find(s=>s.id===task.senseId);if(!sense)return '';const examples=examplesForSense(word,sense);return examples[task.exampleIndex??(task.round-1)%examples.length]?.en||'';}
 function allAudio(word){if(!word)return [];return [spokenWord(word),audioQuestion(word),...wordEntries(word).flatMap(entry=>(entry.examples||[]).map(ex=>ex.en)),...word.senses.flatMap(s=>(s.examples||[]).map(ex=>ex.en))];}
 export function learningAudioLookahead(state){
  const q=state.session,current=q?.current;if(!current||q.stage==='done')return [];

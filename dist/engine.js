@@ -15,7 +15,7 @@ export function dueSenses(state,day=localDay()){return Object.entries(state.reco
 export function plannedCount(state,day=localDay()){if(state.plan.mode!=='date')return state.plan.count;const days=Math.max(1,Math.round((new Date(state.plan.target+'T12:00:00')-new Date(day+'T12:00:00'))/86400000)+1);const completedToday=dayLog(state,day).newWords.filter(id=>courseMap[state.course].words.includes(id)&&getWord(state,id).senses.every(s=>state.records[s.id]?.level&&!state.records[s.id]?.pending)).length;return Math.max(1,Math.ceil((remainingWords(state).length+completedToday)/days));}
 export function projectedFinish(state,day=localDay()){const remaining=remainingWords(state),count=plannedCount(state,day),l=dayLog(state,day);const inProgress=l.newWords.filter(id=>remaining.includes(id)).length;const capacity=Math.max(0,count-l.newWords.length)+inProgress;return addDays(day,Math.max(0,Math.ceil((remaining.length-capacity)/count)));}
 export function dailyStats(state,day=localDay()){const l=dayLog(state,day);return {new:l.newWords.length,review:l.reviewWords.length,passed:l.passed.length,touched:l.touched.length,due:dueSenses(state,day).length};}
-function senseState(state,id){return {strong:!!(state.unknownSenses?.[id]||state.records[id]?.everUnknown||state.records[id]?.weak),known:0,passed:false,lastRound:0,requiresAudio:!state.records[id]?.audioVerified};}
+function senseState(state,id){return {strong:!!(state.unknownSenses?.[id]||state.records[id]?.everUnknown||state.records[id]?.weak),known:0,passed:false,lastRound:0,lastAudioExample:state.records[id]?.lastExampleIndex??-1,requiresAudio:!state.records[id]?.audioVerified};}
 export function begin(state,day=localDay(),extraCount=0){
  if(state.plan.paused)throw new Error('计划已暂停，请先恢复计划。');
  if(state.session?.day===day&&state.session.stage!=='done')return state.session;
@@ -30,7 +30,7 @@ export function begin(state,day=localDay(),extraCount=0){
  const fresh=[...unfinished,...orderedNewWords(state).filter(id=>!log.newWords.includes(id)&&!types[id]).slice(0,allowance)];
  for(const id of fresh){types[id]='new';for(const se of getWord(state,id).senses.filter(s=>!state.records[s.id]?.level||state.records[s.id]?.pending)){states[se.id]=senseState(state,se.id);tasks.push({wordId:id,senseId:se.id,round:1});}}
  // Keep adjacent new-word groups, but rotate meanings to avoid same-word repetition.
- state.session={protocol:LEARNING_PROTOCOL,contextAudioVersion:1,day,course:state.course,queue:tasks,states,types,bareDone:{},stage:'done',current:null,lastWord:null,round:1};
+ state.session={protocol:LEARNING_PROTOCOL,contextAudioVersion:1,audioFirstVersion:1,day,course:state.course,queue:tasks,states,types,bareDone:{},stage:'done',current:null,lastWord:null,round:1};
  next(state,0);return state.session;
 }
 export function next(state,now=Date.now()){
@@ -46,15 +46,15 @@ export function next(state,now=Date.now()){
  if(!log.touched.includes(w.id)){log.touched.push(w.id);if(!log.article?.targetWordIds?.includes(w.id))log.article=null;if(log.quiz){(log.quizHistory??=[]).push(log.quiz);log.quiz=null;}}
  const list=q.types[w.id]==='new'?log.newWords:log.reviewWords;if(!list.includes(w.id))list.push(w.id);
  if(q.lastWord===w.id||task.notBefore>now){q.stage='rest';q.readyAt=Math.max(now+8000,task.notBefore||0);return;}
- setTestStage(q);
+ setTestStage(state);
 }
-export function leaveRest(state,now=Date.now()){const q=state.session;if(q.stage!=='rest'||now<q.readyAt)return false;setTestStage(q);return true;}
+export function leaveRest(state,now=Date.now()){const q=state.session;if(q.stage!=='rest'||now<q.readyAt)return false;setTestStage(state);return true;}
 export function answerBare(state,known){const q=state.session;if(q?.stage!=='bare')throw new Error('当前不是裸词自测。');const id=q.current.wordId;q.bareDone[id]=true;q.bareAnswer=known;
  if(!known)for(const se of getWord(state,id).senses)if(q.states[se.id]){q.states[se.id].strong=true;q.states[se.id].passed=false;(state.unknownSenses??={})[se.id]=true;persistUnknown(state,id,se.id,q.day);}
  if(known){q.stage='listen';q.fastTrack=true;q.listenCue='context';q.listenPlayed=false;}else q.stage='sentence';
 }
 export function answerSense(state,known){const q=state.session;if(q?.stage!=='sentence')throw new Error('当前不是例句自测。');const task=q.current;const st=q.states[task.senseId];q.snapshot=structuredClone(st);q.lastAnswer=known;
- if(!known){st.needsSentence=true;st.needsSentence=true;st.requiresAudio=true;st.strong=true;st.passed=false;(state.unknownSenses??={})[task.senseId]=true;persistUnknown(state,task.wordId,task.senseId,q.day);}
+ if(!known){st.needsSentence=true;st.requiresAudio=true;st.strong=true;st.passed=false;(state.unknownSenses??={})[task.senseId]=true;persistUnknown(state,task.wordId,task.senseId,q.day);}
  if(known)st.needsSentence=false;
  // Visual self-assessment prepares learning; only the typed audio check can earn a pass.
  q.stage='detail';
@@ -63,12 +63,12 @@ export function correctAnswer(state){const q=state.session;if(!['detail','result
 export function continueLearning(state,now=Date.now()){
  const q=state.session;if(!['detail','result'].includes(q?.stage))return false;const t=q.current;const st=q.states[t.senseId];
  if(q.stage==='detail'&&q.types[t.wordId]!=='review'&&!q.gaveUp&&!q.listenVerdict){
-  q.stage='listen';q.listenCue='context';q.listenPlayed=false;q.listenDraft='';q.listenVerdict=null;q.meaningFeedback='';return true;
+  q.stage='listen';q.listenCue='context';q.listenPlayed=false;q.listenDraft='';q.listenVerdict=null;q.meaningFeedback='';chooseExample(state,true,true);return true;
  }
  if(q.types[t.wordId]!=='review'&&q.stage!=='result'&&!q.gaveUp&&!q.listenVerdict)return false;
  if(q.types[t.wordId]==='review'){
   const old=state.records[t.senseId];
-  if(st.passed){if(old?.scheduledDay!==q.day||old?.pending){const result=scheduleReview(old,q.reviewGrade);state.records[t.senseId]={...old,wordId:t.wordId,level:Math.min(6,(old?.level||0)+1),last:q.day,due:addDays(q.day,result.interval),weak:false,everUnknown:!!state.unknownSenses?.[t.senseId],pending:false,audioVerified:true,scheduledDay:q.day,...result};}
+  if(st.passed){if(old?.scheduledDay!==q.day||old?.pending){const result=scheduleReview(old,q.reviewGrade);state.records[t.senseId]={...old,wordId:t.wordId,level:Math.min(6,(old?.level||0)+1),last:q.day,due:addDays(q.day,result.interval),weak:false,everUnknown:!!state.unknownSenses?.[t.senseId],pending:false,audioVerified:true,scheduledDay:q.day,lastExampleIndex:t.exampleIndex??0,...result};}
    const log=dayLog(state,q.day);(log.reviewResults??=[]).push({senseId:t.senseId,grade:q.reviewGrade,cue:q.cue,at:new Date(now).toISOString()});if(!log.passed.includes(t.senseId))log.passed.push(t.senseId);
   }else{persistUnknown(state,t.wordId,t.senseId,q.day);q.queue.push({...t,round:t.round+1,notBefore:now+60000});}
  }else if(st.passed)saveNewPass(state,t);
@@ -76,20 +76,25 @@ export function continueLearning(state,now=Date.now()){
  if(!st.passed&&(q.lastAnswer===false||q.gaveUp||q.types[t.wordId]==='review'))for(const queued of q.queue)if(queued.wordId===t.wordId)queued.notBefore=Math.max(queued.notBefore||0,now+60000);
  q.lastWord=t.wordId;next(state,now);return true;
 }
-export function activeExample(state){const t=state.session.current,w=getWord(state,t.wordId),sense=w.senses.find(s=>s.id===t.senseId),examples=examplesForSense(w,sense);return examples[(t.round-1)%examples.length]||null;}
+export function activeExample(state){const t=state.session.current,w=getWord(state,t.wordId),sense=w.senses.find(s=>s.id===t.senseId),examples=examplesForSense(w,sense);return examples[t.exampleIndex??(t.round-1)%examples.length]||null;}
+function chooseExample(state,audio,afterHint=false){const q=state.session,t=q.current,w=getWord(state,t.wordId),sense=w.senses.find(s=>s.id===t.senseId),examples=examplesForSense(w,sense),st=q.states[t.senseId];if(!examples.length)return;
+ const last=st.lastAudioExample??-1,start=(last>=0?last+1:t.round-1)%examples.length,candidates=examples.map((_,i)=>(start+i)%examples.length);
+ // Rotate every audio assessment; with three examples also avoid the sentence just shown.
+ t.exampleIndex=afterHint&&examples.length>1?(candidates.find(i=>i!==last&&(examples.length<3||i!==t.exampleIndex))??start):start;if(audio)st.lastAudioExample=t.exampleIndex;
+}
 export function audioQuestion(word){return 'What does '+spokenWord(word)+' mean in this sentence?';}
 export function listeningAudio(state){return state.session?.stage==='listen'?(activeExample(state)?.en||''):'';}
 export function markListeningPlayed(state){const q=state.session;if(q?.stage==='listen'){q.listenCue='context';q.listenPlayed=true;}}
 export function setListeningCue(state,cue){const q=state.session;if(q?.stage!=='listen'||cue!=='context'||q.listenCue==='context')return false;q.listenCue='context';q.listenPlayed=false;q.meaningFeedback='';return true;}
-function semanticMatches(state,input,verdict){const q=state.session;return verdict?.verdict==='correct'&&verdict.wordId===q.current.wordId&&verdict.senseId===q.current.senseId&&verdict.round===q.current.round&&normalizeMeaning(verdict.input)===normalizeMeaning(input);}
+function semanticMatches(state,input,verdict){const q=state.session;return verdict?.verdict==='correct'&&verdict.wordId===q.current.wordId&&verdict.senseId===q.current.senseId&&verdict.round===q.current.round&&(verdict.exampleIndex??0)===(q.current.exampleIndex??0)&&normalizeMeaning(verdict.input)===normalizeMeaning(input);}
 export function setMeaningDraft(state,text){const q=state.session;if(!['listen','review'].includes(q?.stage))return;const value=String(text??'');if(value.length>200||/[<>]/.test(value))throw Error('中文释义最多 200 字，请勿输入 HTML 符号。');q.listenDraft=value;}
 export function answerListening(state,input,{unknown=false,semantic}={}){
  const q=state.session;if(q?.stage!=='listen')throw Error('当前不是听音输入验证。');
- const text=String(input??'').trim();if(!unknown&&(!q.listenPlayed||!text))throw Error(!q.listenPlayed?'请先完整听一遍，再输入中文释义。':'请先输入中文释义，或选择“没听懂 / 不知道”。');
+ const text=String(input??'').trim();if(!unknown&&!text)throw Error('请先输入中文释义，或选择“没听懂 / 不知道”。');
  if(text.length>200||/[<>]/.test(text))throw Error('中文释义格式无效。');
  const t=q.current,w=getWord(state,t.wordId),sense=w.senses.find(s=>s.id===t.senseId),st=q.states[t.senseId];
  q.listenCue='context';const correct=!unknown&&(checkMeaning(w,sense,text,'context',activeExample(state))||semanticMatches(state,text,semantic));
- q.snapshot=structuredClone(st);q.lastAnswer=correct;q.listenDraft=text;q.listenVerdict={correct,input:text,cue:q.listenCue,round:t.round};
+ q.snapshot=structuredClone(st);q.lastAnswer=correct;q.listenDraft=text;q.listenVerdict={correct,input:text,cue:q.listenCue,round:t.round,exampleIndex:t.exampleIndex??0};
  if(correct&&t.round>st.lastRound){st.known++;st.lastRound=t.round;st.passed=st.known>=(st.strong?3:1)&&!st.needsSentence;st.requiresAudio=false;}
  if(!correct){st.needsSentence=true;st.strong=true;st.passed=false;(state.unknownSenses??={})[t.senseId]=true;persistUnknown(state,t.wordId,t.senseId,q.day);}
  if(st.passed)saveNewPass(state,t);q.stage=correct?'detail':'result';return q.listenVerdict;
@@ -108,7 +113,7 @@ export function validateState(value){
  for(const r of Object.values(value.records))if((r.interval!==undefined&&(!Number.isInteger(r.interval)||r.interval<1||r.interval>180))||(r.grade!==undefined&&(!Number.isInteger(r.grade)||r.grade<0||r.grade>4))||(r.pending!==undefined&&typeof r.pending!=='boolean'))throw Error('复习间隔无效。');
  if(value.session?.stage==='review'&&(!['audio','context','spelling','sentence'].includes(value.session.cue)||value.session.types[value.session.current?.wordId]!=='review'))throw Error('复习步骤无效。');
  if(value.session?.reviewGrade!=null&&(!Number.isInteger(value.session.reviewGrade)||value.session.reviewGrade<0||value.session.reviewGrade>4))throw Error('复习评级无效。');
- if(value.session){const q=value.session;if(!courseMap[q.course]||!/^\d{4}-\d{2}-\d{2}$/.test(q.day))throw new Error('会话日期或课程无效。');if(!['bare','sentence','detail','rest','done','review','listen','result'].includes(q.stage)||!Array.isArray(q.queue)||!q.states||!q.types||!q.bareDone)throw new Error('练习进度无效。');if(q.stage!=='done'&&!q.current)throw new Error('缺少当前卡片。');for(const st of Object.values(q.states))if(typeof st.strong!=='boolean'||typeof st.passed!=='boolean'||!Number.isInteger(st.known)||st.known<0||!Number.isInteger(st.lastRound)||(st.requiresAudio!==undefined&&typeof st.requiresAudio!=='boolean'))throw new Error('词义状态无效。');for(const t of [...q.queue,...(q.current?[q.current]:[])])if(!getWord(value,t.wordId)?.senses.some(s=>s.id===t.senseId)||!q.states[t.senseId]||!Number.isInteger(t.round)||t.round<1)throw new Error('练习卡片无效。');
+ if(value.session){const q=value.session;if(!courseMap[q.course]||!/^\d{4}-\d{2}-\d{2}$/.test(q.day))throw new Error('会话日期或课程无效。');if(!['bare','sentence','detail','rest','done','review','listen','result'].includes(q.stage)||!Array.isArray(q.queue)||!q.states||!q.types||!q.bareDone)throw new Error('练习进度无效。');if(q.stage!=='done'&&!q.current)throw new Error('缺少当前卡片。');for(const st of Object.values(q.states))if(typeof st.strong!=='boolean'||typeof st.passed!=='boolean'||!Number.isInteger(st.known)||st.known<0||!Number.isInteger(st.lastRound)||(st.requiresAudio!==undefined&&typeof st.requiresAudio!=='boolean')||(st.lastAudioExample!==undefined&&(!Number.isInteger(st.lastAudioExample)||st.lastAudioExample< -1||st.lastAudioExample>1000)))throw new Error('词义状态无效。');for(const t of [...q.queue,...(q.current?[q.current]:[])])if(!getWord(value,t.wordId)?.senses.some(s=>s.id===t.senseId)||!q.states[t.senseId]||!Number.isInteger(t.round)||t.round<1)throw new Error('练习卡片无效。');
   if(q.contextAudioVersion!==undefined&&q.contextAudioVersion!==1)throw Error('听音语境版本无效。');
   if(q.protocol!==undefined&&q.protocol!==LEARNING_PROTOCOL)throw Error('学习流程版本无效。');
   if(['listen','result'].includes(q.stage)&&(q.types[q.current.wordId]!=='new'||!['word','context'].includes(q.listenCue)))throw Error('听音验证步骤无效。');
@@ -127,8 +132,14 @@ export function validateState(value){
    q.snapshot=null;q.lastAnswer=null;q.listenPlayed=false;q.listenDraft='';q.listenVerdict=null;q.cuePlayed=false;
   }
   if(q.contextAudioVersion!==1){if(q.stage==='listen'){q.listenCue='context';q.listenPlayed=false;}if(q.stage==='review'){q.cue=['audio','context'].includes(q.cue)?'context':'sentence';q.cuePlayed=false;}q.contextAudioVersion=1;}
+  if(q.audioFirstVersion!==undefined&&q.audioFirstVersion!==1)throw Error('听音优先版本无效。');q.audioFirstVersion=1;
+  for(const task of [...q.queue,...(q.current?[q.current]:[])]){const word=getWord(value,task.wordId),sense=word.senses.find(s=>s.id===task.senseId),count=examplesForSense(word,sense).length;if(task.exampleIndex!==undefined&&(!Number.isInteger(task.exampleIndex)||task.exampleIndex<0||task.exampleIndex>=count))throw Error('学习例句编号无效。');}
+  if(q.current){const word=getWord(value,q.current.wordId),sense=word.senses.find(s=>s.id===q.current.senseId),count=examplesForSense(word,sense).length;q.current.exampleIndex??=(q.current.round-1)%Math.max(1,count);
+   if(q.stage==='bare'){q.stage='listen';q.listenCue='context';q.listenPlayed=false;q.bareDone[q.current.wordId]=true;}
+   if(q.stage==='listen'||q.stage==='review'&&['audio','context'].includes(q.cue))q.states[q.current.senseId].lastAudioExample=q.current.exampleIndex;
+  }
  }
- for(const record of Object.values(value.records))if(record.audioVerified!==undefined&&typeof record.audioVerified!=='boolean')throw Error('听音验证记录无效。');
+ for(const record of Object.values(value.records)){if(record.audioVerified!==undefined&&typeof record.audioVerified!=='boolean')throw Error('听音验证记录无效。');if(record.lastExampleIndex!==undefined&&(!Number.isInteger(record.lastExampleIndex)||record.lastExampleIndex<0||record.lastExampleIndex>1000))throw Error('已学例句编号无效。');}
  for(const [day,l] of Object.entries(value.days)){if(l.practicePack)validatePractice(l.practicePack,value,l.practicePack.passages||[]);if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!['newWords','reviewWords','touched','passed'].every(k=>Array.isArray(l[k])))throw new Error('日期记录无效。');for(const k of ['newWords','reviewWords','touched'])if(l[k].some(id=>!getWord(value,id)))throw new Error('词汇记录无效。');if(l.passed.some(id=>!all.has(id)))throw new Error('词义记录无效。');if(l.article){if(l.article.version===2)l.article=validateReadingArticle(l.article,value.customWords);else if(!Array.isArray(l.article.paragraphs)||l.article.paragraphs.some(p=>!getWord(value,p.wordId)?.senses.some(s=>s.id===p.senseId)))throw new Error('阅读记录无效。');}if(l.quizHistory&&(!Array.isArray(l.quizHistory)||l.quizHistory.some(q=>!Array.isArray(q.answers))))throw new Error('历史测验记录无效。');if(l.quiz&&(!Array.isArray(l.quiz.questions)||!Array.isArray(l.quiz.answers)||!Number.isInteger(l.quiz.index)||l.quiz.index<0||l.quiz.index>l.quiz.questions.length||l.quiz.questions.some(q=>!getWord(value,q.wordId)?.senses.some(s=>s.id===q.senseId)||!Array.isArray(q.options)||q.options.length!==4||!q.options.includes(q.meaning))))throw new Error('测验记录无效。');}
  return value;
 }
@@ -136,9 +147,9 @@ export function validateState(value){
 function persistUnknown(state,wordId,senseId,day){
  if(state.knownWords?.[wordId])return;
  const old=state.records[senseId],due=day;
- state.records[senseId]={...old,wordId,level:old?.level||1,last:old?.last||day,due:old?.due&&old.due<due?old.due:due,interval:1,pending:true,weak:true,everUnknown:true};
+ const task=state.session?.current;state.records[senseId]={...old,wordId,level:old?.level||1,last:old?.last||day,due:old?.due&&old.due<due?old.due:due,interval:1,pending:true,weak:true,everUnknown:true,...(task?.senseId===senseId&&task.exampleIndex!==undefined?{lastExampleIndex:task.exampleIndex}:{})};
 }
-function setTestStage(q){if(q.types[q.current.wordId]==='review'){q.stage='review';q.cue=q.states[q.current.senseId].needsSentence?'sentence':'context';q.cuePlayed=false;}else q.stage=!q.bareDone[q.current.wordId]?'bare':'sentence';}
+function setTestStage(state){const q=state.session,visual=!!q.states[q.current.senseId].needsSentence;if(q.types[q.current.wordId]==='review'){q.stage='review';q.cue=visual?'sentence':'context';q.cuePlayed=false;}else{q.stage=visual?'sentence':'listen';q.listenCue='context';q.listenPlayed=false;q.bareDone[q.current.wordId]=true;}chooseExample(state,!visual);}
 export function reviewAudio(state){const q=state.session;return q?.stage==='review'&&['audio','context'].includes(q.cue)?activeExample(state)?.en||'':'';}
 export function markReviewPlayed(state){const q=state.session;if(q?.stage==='review'&&['audio','context'].includes(q.cue))q.cuePlayed=true;}
 export function answerReview(state,known){
@@ -151,7 +162,6 @@ export function answerReview(state,known){
 export function answerReviewMeaning(state,input,{semantic}={}){
  const q=state.session;if(q?.stage!=='review')throw Error('当前不是到期复习。');const value=String(input??'').trim();
  if(!value||value.length>200||/[<>]/.test(value))throw Error('请填写有效的中文释义，或选择“没听懂 / 不知道”。');
- if(['audio','context'].includes(q.cue)&&!q.cuePlayed)throw Error('请先完整听一遍，再输入中文释义。');
  const w=getWord(state,q.current.wordId),sense=w.senses.find(s=>s.id===q.current.senseId);
  q.listenDraft=value;
  if(checkMeaning(w,sense,value,'context',activeExample(state))||semanticMatches(state,value,semantic)){q.states[q.current.senseId].needsSentence=false;return finishReview(state,{audio:4,context:4,spelling:1,sentence:1}[q.cue]);}
@@ -180,7 +190,7 @@ export function orderedNewWords(state){const candidates=remainingWords(state),ty
 
 function saveNewPass(state,task){
  const q=state.session,st=q.states[task.senseId],old=state.records[task.senseId];
- if(old?.scheduledDay!==q.day||old.pending)state.records[task.senseId]={...old,wordId:task.wordId,level:Math.min(6,(old?.pending?0:old?.level||0)+1),due:addDays(q.day,1),last:q.day,interval:1,pending:false,audioVerified:true,weak:st.strong,everUnknown:!!state.unknownSenses?.[task.senseId],scheduledDay:q.day};
+ if(old?.scheduledDay!==q.day||old.pending)state.records[task.senseId]={...old,wordId:task.wordId,level:Math.min(6,(old?.pending?0:old?.level||0)+1),due:addDays(q.day,1),last:q.day,interval:1,pending:false,audioVerified:true,weak:st.strong,everUnknown:!!state.unknownSenses?.[task.senseId],scheduledDay:q.day,lastExampleIndex:task.exampleIndex??0};
  const log=dayLog(state,q.day);if(!log.passed.includes(task.senseId))log.passed.push(task.senseId);
 }
 export function markWordUnremembered(state,wordId,day=localDay()){

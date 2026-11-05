@@ -1,3 +1,4 @@
+import {answerListening} from '../dist/engine.js';
 import {answerReviewCorrect} from './word-learning-helpers.mjs';
 import {giveUpMemory,leaveRest} from '../dist/engine.js';
 import test from 'node:test';import assert from 'node:assert/strict';
@@ -30,7 +31,7 @@ test('relations distinguish meaning, spelling and family; related order never en
  for(const w of words)for(const n of w.notes.filter(n=>n.difference.startsWith('拼写对比：')))assert.equal(n.type,'形近词');
 });
 test('unremembered new words survive exit before detail and become next-day reviews',()=>{
- const s=initial();s.plan.count=1;begin(s,DAY);answerBare(s,false);const r=clone(s);assert.equal(r.records['light-n'].pending,true);assert.equal(r.records['light-adj'].due,DAY);assert.ok(remainingWords(r).includes('light'));begin(r,NEXT);assert.equal(r.session.types.light,'review');assert.equal(r.session.stage,'review');assert.equal(r.session.cue,'context');
+ const s=initial();s.plan.count=1;begin(s,DAY);answerListening(s,'',{unknown:true});const r=clone(s);assert.equal(r.records['light-n'].pending,true);assert.equal(r.records['light-adj'],undefined);assert.ok(remainingWords(r).includes('light'));begin(r,NEXT);assert.equal(r.session.types.light,'review');assert.equal(r.session.stage,'review');assert.equal(r.session.cue,'context');
 });
 test('context audio and sentence assistance, submitted state and grade survive refresh',()=>{
  for(const [cue,grade,declines] of [['context',4,0],['sentence',1,1]]){
@@ -53,7 +54,7 @@ test('weights produce bounded increasing intervals without giving longer credit 
  assert.equal(scheduleReview({interval:1},4).interval,3);assert.equal(scheduleReview({interval:8},3).interval,13);assert.equal(scheduleReview({interval:8},2).interval,6);assert.equal(scheduleReview({interval:8},1).interval,3);
 });
 test('known marker removes every sense and pending queue entry; restoring makes it due again',()=>{
- const s=initial();s.plan.count=2;begin(s,DAY);answerBare(s,false);excludeKnownWord(s,'light',DAY);assert.ok(s.knownWords.light);assert.ok(!s.records['light-n']);assert.ok(!s.records['light-adj']);assert.ok(!s.session.queue.some(t=>t.wordId==='light'));assert.notEqual(s.session.current?.wordId,'light');assert.ok(!remainingWords(s).includes('light'));assert.ok(!dueSenses(s,NEXT).includes('light-n'));clone(s);restoreKnownWord(s,'light',DAY);assert.ok(!s.knownWords.light);assert.ok(dueSenses(s,DAY).includes('light-n'));clone(s);
+ const s=initial();s.plan.count=2;begin(s,DAY);answerListening(s,'',{unknown:true});excludeKnownWord(s,'light',DAY);assert.ok(s.knownWords.light);assert.ok(!s.records['light-n']);assert.ok(!s.records['light-adj']);assert.ok(!s.session.queue.some(t=>t.wordId==='light'));assert.notEqual(s.session.current?.wordId,'light');assert.ok(!remainingWords(s).includes('light'));assert.ok(!dueSenses(s,NEXT).includes('light-n'));clone(s);restoreKnownWord(s,'light',DAY);assert.ok(!s.knownWords.light);assert.ok(dueSenses(s,DAY).includes('light-n'));clone(s);
 });
 test('old progress migrates without losing dates; corrupted new review fields are rejected',()=>{
  const s=initial();delete s.knownWords;s.records['bright-adj']={wordId:'bright',level:3,due:DAY};clone(s);begin(s,DAY);clone(s);const bad=clone(s);bad.session.cue='invented';assert.throws(()=>validateState(bad));s.records['bright-adj'].interval=-1;assert.throws(()=>validateState(s));

@@ -9,9 +9,9 @@ const DAY='2026-10-29';
 function study(){const state=initial();state.plan.count=1;begin(state,DAY);return state;}
 function reachListen(state,known=true){if(state.session.stage==='bare')answerBare(state,known);if(state.session.stage==='sentence'){answerSense(state,known);continueLearning(state,0);}assert.equal(state.session.stage,'listen');}
 
-test('bare recognition jumps to audio and only a completed typed answer records memory',()=>{
- const state=study();answerBare(state,true);assert.equal(state.session.stage,'listen');assert.equal(state.records['light-n'],undefined);
- assert.throws(()=>answerListening(state,'光线'),/先完整听/);markListeningPlayed(state);assert.throws(()=>answerListening(state,'   '),/输入中文/);
+test('new learning starts with context audio and a correct early typed answer records memory',()=>{
+ const state=study();assert.equal(state.session.stage,'listen');assert.equal(state.records['light-n'],undefined);
+ assert.equal(state.session.listenPlayed,false);assert.throws(()=>answerListening(state,'   '),/输入中文/);
  answerListening(state,'光线');assert.equal(state.session.stage,'detail');assert.equal(state.session.states['light-n'].passed,true);assert.equal(state.records['light-n'].audioVerified,true);
  assert.throws(()=>answerListening(state,'光线'));continueLearning(state,0);assert.equal(state.records['light-n'].pending,false);assert.ok(dueSenses(state,'2026-10-30').includes('light-n'));
 });
@@ -29,9 +29,9 @@ test('wrong typed meaning and unknown both remain unpassed, then show another sa
   markListeningPlayed(state);answerListening(state,'光线');assert.equal(state.session.states['light-n'].known,1);assert.equal(state.session.states['light-n'].passed,false);
  }
 });
-test('standalone word cue is unavailable and incomplete sentence audio cannot grant a pass',()=>{
+test('standalone word cue stays unavailable; playback failure cannot block typed answers',()=>{
  const state=study();reachListen(state);
- assert.equal(setListeningCue(state,'word'),false);assert.equal(state.session.listenCue,'context');assert.equal(state.session.listenPlayed,false);assert.throws(()=>answerListening(state,'光线'));
+ assert.equal(setListeningCue(state,'word'),false);assert.equal(state.session.listenCue,'context');assert.equal(state.session.listenPlayed,false);
  listeningUnavailable(state);assert.equal(state.session.audioUnavailable,true);assert.equal(state.session.states['light-n'].passed,false);
  markListeningPlayed(state);answerListening(state,'光线');assert.equal(state.session.states['light-n'].passed,true);
 });
@@ -42,7 +42,7 @@ test('typed draft, current cue and result survive backup validation',()=>{
  const bad=structuredClone(state);bad.session.listenVerdict.round++;assert.throws(()=>validateState(bad));
 });
 test('old active sessions gain an audio gate without deleting completed history or changing IDs',()=>{
- const state=study();answerBare(state,false);answerSense(state,true);delete state.session.protocol;
+ const state=study();state.session.stage='bare';answerBare(state,false);answerSense(state,true);delete state.session.protocol;
  state.session.states['light-n'].passed=true;state.session.states['light-n'].known=1;
  state.records['book-n']={wordId:'book',level:2,due:'2026-11-10'};
  const oldRecord=structuredClone(state.records['book-n']);const restored=validateState(JSON.parse(JSON.stringify(state)));
@@ -80,7 +80,7 @@ test('old unsubmitted review grades cannot create audio verification without typ
  const original=structuredClone(state.records['bright-adj']);const restored=validateState(JSON.parse(JSON.stringify(state)));
  assert.equal(restored.session.stage,'review');assert.equal(restored.session.cue,'audio');assert.equal(restored.session.reviewGrade,null);
  assert.equal(continueLearning(restored),false);assert.deepEqual(restored.records['bright-adj'],original);
- assert.equal(restored.session.states['bright-adj'].passed,false);assert.throws(()=>answerReviewMeaning(restored,'明亮'));
+ assert.equal(restored.session.states['bright-adj'].passed,false);
  markReviewPlayed(restored);answerReviewMeaning(restored,'明亮');continueLearning(restored);
  assert.equal(restored.records['bright-adj'].audioVerified,true);
 });

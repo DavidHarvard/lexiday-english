@@ -9,7 +9,7 @@ import worker from '../server/worker.js';
 import {database} from '../server/local-db.mjs';
 const DAY='2026-11-01';
 function learning(){const s=initial();s.plan.count=1;begin(s,DAY);return s;}
-function listening(){const s=learning();answerBare(s,true);return s;}
+function listening(){return learning();}
 const furnished={wordId:'furnished',senseId:'furnished-adj-1',round:1,input:'房子里面已经提供了家具'};
 
 test('Chinese paraphrases accept equivalent furniture descriptions and distinguish deposit meanings',()=>{
@@ -47,10 +47,10 @@ test('semantic endpoint caches confirmed paraphrases, rejects foreign requests a
  }finally{globalThis.caches=saved;db.close();}
 });
 
-test('semantic results cannot bypass complete audio or apply to another task, round or answer',()=>{
- for(const mismatch of [null,'wordId','senseId','round','input']){
+test('early semantic answers remain bound to the exact task, example, round and input',()=>{
+ for(const mismatch of [null,'wordId','senseId','round','input','exampleIndex']){
   const s=listening(),t=s.session.current,input='照进房间的亮光',semantic={...t,input:normalizeMeaning(input),verdict:'correct'};
-  assert.throws(()=>answerListening(s,input,{semantic}),/先完整听/);markListeningPlayed(s);
+  assert.equal(s.session.listenPlayed,false);
   if(mismatch)semantic[mismatch]=mismatch==='round'?2:'different';
   assert.equal(answerListening(s,input,{semantic}).correct,mismatch===null);
  }
@@ -58,7 +58,7 @@ test('semantic results cannot bypass complete audio or apply to another task, ro
 
 test('giving up at any learning prompt opens meaning details without passing and retains another round',()=>{
  for(const stage of ['bare','sentence','listen']){
-  let s=stage==='listen'?listening():learning();if(stage==='sentence')answerBare(s,false);
+  let s=learning();s.session.stage=stage;
   const task={...s.session.current},first=activeExample(s).en;giveUpMemory(s);
   assert.equal(s.session.stage,'detail');assert.equal(s.session.gaveUp,true);assert.equal(s.session.states[task.senseId].passed,false);assert.equal(s.session.states[task.senseId].known,0);
   s=validateState(structuredClone(s));continueLearning(s,0);

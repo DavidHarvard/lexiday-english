@@ -1,3 +1,4 @@
+import {giveUpMemory} from '../dist/engine.js';
 import {answerSense} from './word-learning-helpers.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -42,8 +43,8 @@ test('new multiple meanings do not pass just because detail was shown; original 
  const state=initial();state.course='ielts-basic';state.plan.count=5;begin(state,DAY);
  let guard=30;
  while(state.session.current.wordId!=='deposit'&&guard--){if(state.session.stage==='bare')answerBare(state,true);answerSense(state,true);continueLearning(state,0);}
- assert.ok(guard>0);answerBare(state,false);answerSense(state,true);
- const pending=state.session.states['deposit-v-2'];assert.equal(pending.known,0);assert.equal(pending.passed,false);assert.equal(pending.strong,true);
+ assert.ok(guard>0);giveUpMemory(state);
+ const pending=state.session.states['deposit-v-2'];assert.equal(pending.known,0);assert.equal(pending.passed,false);assert.equal(pending.strong,false);
  const copy=validateState(JSON.parse(JSON.stringify(state)));assert.deepEqual(copy.session,state.session);
  const old=initial();old.records['book-n']={wordId:'book',level:1,due:DAY};old.records['book-v']={wordId:'book',level:1,due:DAY};
  const migrated=validateState(JSON.parse(JSON.stringify(old)));assert.deepEqual(migrated.records,old.records);

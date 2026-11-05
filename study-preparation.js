@@ -16,7 +16,7 @@ export function createStudyPreparation({getState,save,render,isLearning}){
   current.repaired=true;const plan=learningSessionAudio(owner).flatMap(text=>speechChunks(text));
   const result=await speechAudioCache.prepare(plan,{signal:current.controller.signal,onProgress:value=>{if(job!==current)return;Object.assign(current,value);update();}});if(job!==current)return;current.failed=result.failed.length;current.done=!current.failed;current.finished=true;
  }catch(error){if(current.controller.signal.aborted)return;current.repairError=error.message;current.finished=true;}
- if(job===current&&getState()===owner&&isLearning())render();}
+ if(job===current&&getState()===owner&&isLearning()&&!current.bypass)render();}
  function ensure(){const state=getState(),q=state.session;if(!q||q.stage==='done')return;if(owner===state&&session===q&&job)return;job?.controller.abort();owner=state;session=q;job={controller:new AbortController(),completed:0,total:0,failed:0,repaired:false,done:false,bypass:false,finished:false};void prepare(job);}
  function ready(){return !job||job.done||job.repaired&&job.bypass;}
  function view(){if(ready())return '';return '<section class="panel preparation-card"><span class="eyebrow">TODAY’S AUDIO</span><h1>准备今天的单词与例句音频</h1><p>本轮新词、到期复习词和各词义例句会一起下载。已下载的音频下次直接使用。</p><progress id="study-preparation-progress" max="'+Math.max(1,job.total)+'" value="'+job.completed+'"></progress><p id="study-preparation-status" role="status">'+escape(status())+'</p>'+(job.finished?'<button class="primary" data-preparation="retry">重试未完成的音频</button>':'')+(job.repaired?'<button data-preparation="continue">先开始，后台继续下载</button>':'')+'<p class="fine">首次准备需要联网。页面会显示实际下载进度，准备完成后自动进入学习。</p></section>';}

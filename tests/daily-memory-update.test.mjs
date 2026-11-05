@@ -15,7 +15,7 @@ test('word notes keep independent dated entries and survive backup without dupli
  const restored=validateState(structuredClone(s));assert.equal(restored.wordNotes.commute.length,2);assert.equal(restored.wordNotes.commute[0].day,DAY);assert.equal(restored.wordNotes.communicate,undefined);assert.throws(()=>addWordNote(s,'commute','<script>',DAY));
 });
 test('recognition skips visual hints, success persists immediately, and forgetting removes that pass',()=>{
- const s=initial();s.plan.count=1;begin(s,DAY);answerBare(s,true);assert.equal(s.session.stage,'listen');markListeningPlayed(s);answerListening(s,'光线');assert.equal(s.session.stage,'detail');assert.equal(s.records['light-n'].audioVerified,true);assert.ok(dayLog(s,DAY).passed.includes('light-n'));
+ const s=initial();s.plan.count=1;begin(s,DAY);assert.equal(s.session.stage,'listen');markListeningPlayed(s);answerListening(s,'光线');assert.equal(s.session.stage,'detail');assert.equal(s.records['light-n'].audioVerified,true);assert.ok(dayLog(s,DAY).passed.includes('light-n'));
  markWordUnremembered(s,'light',DAY);assert.equal(s.records['light-n'].pending,true);assert.equal(s.records['light-n'].due,DAY);assert.ok(!dayLog(s,DAY).passed.includes('light-n'));continueLearning(s,0);assert.ok([s.session.current,...s.session.queue].some(t=>t.senseId==='light-n'));validateState(structuredClone(s));
 });
 test('failed review repeats today, requires understanding the sentence and then an audio answer',()=>{
@@ -23,10 +23,10 @@ test('failed review repeats today, requires understanding the sentence and then 
  let guard=10;while(s.session.current.senseId!=='bright-adj'&&guard--){if(s.session.stage==='rest')leaveRest(s,1e15);giveUpMemory(s);continueLearning(s,0);}assert.ok(guard>0);if(s.session.stage==='rest')leaveRest(s,1e15);
  assert.equal(s.session.cue,'sentence');assert.equal(s.records['bright-adj'].due,DAY);assert.equal(s.records['bright-adj'].pending,true);answerReviewMeaning(s,'明亮');assert.equal(s.session.states['bright-adj'].passed,false);continueLearning(s,0);
  assert.ok(s.session.stage==='rest'||s.session.current.wordId!=='bright','never immediately test the reviewed word');guard=12;while(s.session.current.senseId!=='bright-adj'&&guard--){if(s.session.stage==='rest')leaveRest(s,1e15);giveUpMemory(s);continueLearning(s,61000);}assert.ok(guard>0);if(s.session.stage==='rest')leaveRest(s,1e15);
- assert.equal(s.session.cue,'context');assert.throws(()=>answerReviewMeaning(s,'明亮'));markReviewPlayed(s);answerReviewMeaning(s,'明亮');continueLearning(s,61000);assert.equal(s.records['bright-adj'].pending,false);assert.equal(s.records['bright-adj'].audioVerified,true);
+ assert.equal(s.session.cue,'context');assert.equal(s.session.cuePlayed,false);answerReviewMeaning(s,'明亮');continueLearning(s,61000);assert.equal(s.records['bright-adj'].pending,false);assert.equal(s.records['bright-adj'].audioVerified,true);
 });
 test('a missed sentence cannot pass just by accumulating auditory answers',()=>{
- const s=initial();s.plan.count=1;begin(s,DAY);answerBare(s,false);answerSense(s,false);s.session.states['light-n'].known=2;continueLearning(s,0);markListeningPlayed(s);answerListening(s,'光线');assert.equal(s.session.states['light-n'].passed,false);
+ const s=initial();s.plan.count=1;begin(s,DAY);s.session.stage='sentence';answerSense(s,false);s.session.states['light-n'].known=2;continueLearning(s,0);markListeningPlayed(s);answerListening(s,'光线');assert.equal(s.session.states['light-n'].passed,false);
 });
 test('reading collection adds known and new dictionary words to tomorrow without leaking private entries',()=>{
  const s=initial();addReadingWord(s,wordMap.commute,'A passage about commuting.',DAY);addReadingWord(s,custom,'A kingfisher sat near a stream.',DAY);assert.equal(addReadingWord(s,custom,'Repeated selection',DAY),false);assert.equal(s.records[custom.senses[0].id].due,'2026-11-04');
